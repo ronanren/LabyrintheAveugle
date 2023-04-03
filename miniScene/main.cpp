@@ -62,13 +62,11 @@ static void onMouseButton(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
-
 static void onMouseMove(GLFWwindow* window, double x, double y)
 {
     if (scene == nullptr) return;
     scene->onMouseMove(x,y);
 }
-
 
 static void onKeyboard(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -105,7 +103,7 @@ void error_callback(int error, const char* description)
 /** point d'entrée du programme **/
 int main(int argc,char **argv)
 {
-    // initialisation de GLFW
+    //Initialisation de GLFW
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW" << std::endl;
         exit(EXIT_FAILURE);
@@ -117,7 +115,7 @@ int main(int argc,char **argv)
     glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
 
     // initialisation de la fenêtre
-    GLFWwindow* window = glfwCreateWindow(640,480, "Livre OpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(640,480, "Labyrinthe Aveugle", NULL, NULL);
     if (window == nullptr) {
         std::cerr << "Failed to create window" << std::endl;
         glfwTerminate();
@@ -125,7 +123,7 @@ int main(int argc,char **argv)
     }
     glfwMakeContextCurrent(window);
     glfwSetWindowPos(window, 200, 200);
-    glfwSetWindowTitle(window, "Cameras - TurnTable");
+    glfwSetWindowTitle(window, "Labyrinthe Aveugle");
 
     // initialisation de glew
     GLenum err = glewInit();
