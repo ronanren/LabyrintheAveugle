@@ -1,6 +1,6 @@
 # LabyrintheAveugle
 
-## Librairies
+## Bibliothèques
 
 ```bash
 # for manjaro 
@@ -11,8 +11,12 @@ sudo apt install g++ mesa-utils libglew-dev libglfw3-dev libsdl2-dev libsdl2-ima
 make cleanalllibs && make main
 ```
 
-## Development
+## Développement
 
 ```bash
 make run
 ```
+
+## Rapport
+
+https://github.com/typst/typst
