@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+miniScene/image.ppm
+miniScene/main
