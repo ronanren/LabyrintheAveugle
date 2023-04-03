@@ -11,7 +11,7 @@
 
 #include <utils.h>
 #include "Scene.h"
-
+#include "Labyrinthe.h"
 
 /**
  * Scène à dessiner
@@ -122,7 +122,7 @@ int main(int argc,char **argv)
         exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(window);
-    glfwSetWindowPos(window, 200, 200);
+    glfwSetWindowPos(window, 200, 50);
     glfwSetWindowTitle(window, "Labyrinthe Aveugle");
 
     // initialisation de glew
@@ -159,6 +159,10 @@ int main(int argc,char **argv)
     std::cout << "Usage:" << std::endl;
     std::cout << "Left button to rotate object" << std::endl;
     std::cout << "Q,D (axis x) A,W (axis y) Z,S (axis z) keys to move" << std::endl;
+
+    // génération du labyrinthe aléatoire
+    Labyrinthe labyrinthe(4, 4);
+    labyrinthe.generer();
 
     // boucle principale
     onSurfaceChanged(window, 640,480);

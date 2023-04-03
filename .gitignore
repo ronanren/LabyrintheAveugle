@@ -31,5 +31,5 @@
 *.out
 *.app
 
-miniScene/image.ppm
-miniScene/main
+projet/image.ppm
+projet/main
