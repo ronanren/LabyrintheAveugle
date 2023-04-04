@@ -3,9 +3,9 @@
 
 // Définition de la classe Scene
 
-#include <gl-matrix.h>
+#include <libs/gl-matrix.h>
 
-#include "Light.h"
+#include "libs/Light.h"
 
 #include "Cube.h"
 #include "Duck.h"

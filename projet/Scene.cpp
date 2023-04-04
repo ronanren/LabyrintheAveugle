@@ -8,7 +8,7 @@
 #include <AL/alc.h>
 #include <AL/alut.h>
 
-#include <utils.h>
+#include <libs/utils.h>
 
 #include "Scene.h"
 
