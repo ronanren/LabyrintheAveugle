@@ -9,15 +9,14 @@
 
 #include "Cube.h"
 #include "Ground.h"
-
-const int size = 4;
+#include "Constants.h"
 
 class Scene
 {
 private:
 
     // objets de la scène
-    Cube* m_Cube[size][size];
+    Cube* m_Cube[hauteur][largeur];
     Ground* m_Ground;
 
     // lampes

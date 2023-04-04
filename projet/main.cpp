@@ -144,6 +144,10 @@ int main(int argc,char **argv)
     alListener3f(AL_POSITION, 0, 0, 0);
     alListener3f(AL_VELOCITY, 0, 0, 0);
 
+    // génération du labyrinthe aléatoire
+    Labyrinthe labyrinthe(largeur, hauteur);
+    labyrinthe.generer();
+
     // création de la scène => création des objets...
     scene = new Scene();
     //debugGLFatal("new Scene()");
@@ -159,10 +163,6 @@ int main(int argc,char **argv)
     std::cout << "Usage:" << std::endl;
     std::cout << "Left button to rotate object" << std::endl;
     std::cout << "Q,D (axis x) A,W (axis y) Z,S (axis z) keys to move" << std::endl;
-
-    // génération du labyrinthe aléatoire
-    Labyrinthe labyrinthe(4, 4);
-    labyrinthe.generer();
 
     // boucle principale
     onSurfaceChanged(window, 640,480);
