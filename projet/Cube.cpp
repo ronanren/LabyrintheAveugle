@@ -61,7 +61,7 @@ public:
 
 
 /** constructeur */
-Cube::Cube(std::string soundpathname): Mesh("cube")
+Cube::Cube(std::string soundpathname, int walls): Mesh("cube")
 {
     // matériau
     m_Material = new MaterialCube();
@@ -98,11 +98,72 @@ Cube::Cube(std::string soundpathname): Mesh("cube")
 
     // quads
     //addQuad(P1,P0,P3,P2);
-    addQuad(P4,P5,P6,P7);
-    addQuad(P5,P4,P0,P1);
-    addQuad(P4,P7,P3,P0);
-    addQuad(P7,P6,P2,P3);
-    addQuad(P6,P5,P1,P2);
+    addQuad(P4,P5,P6,P7); //dessous
+
+    switch (walls) {
+        case 1:
+            addQuad(P5,P4,P0,P1); //est
+            addQuad(P4,P7,P3,P0); //sud
+            addQuad(P6,P5,P1,P2); //nord
+            break;
+        case 2:
+            addQuad(P5,P4,P0,P1); //est
+            addQuad(P7,P6,P2,P3); //ouest
+            addQuad(P6,P5,P1,P2); //nord
+            break;
+        case 3:
+            addQuad(P5,P4,P0,P1); //est
+            addQuad(P6,P5,P1,P2); //nord
+            break;
+        case 4:
+            addQuad(P4,P7,P3,P0); //sud
+            addQuad(P7,P6,P2,P3); //ouest
+            addQuad(P6,P5,P1,P2); //nord
+            break;
+        case 5:
+            addQuad(P4,P7,P3,P0); //sud
+            addQuad(P6,P5,P1,P2); //nord
+            break;
+        case 6:
+            addQuad(P7,P6,P2,P3); //ouest
+            addQuad(P6,P5,P1,P2); //nord
+            break;
+        case 7:
+            addQuad(P6,P5,P1,P2); //nord
+            break;
+        case 8:
+            addQuad(P5,P4,P0,P1); //est
+            addQuad(P4,P7,P3,P0); //sud
+            addQuad(P7,P6,P2,P3); //ouest
+            break;
+        case 9:
+            addQuad(P5,P4,P0,P1); //est
+            addQuad(P4,P7,P3,P0); //sud
+            break;
+        case 10:
+            addQuad(P5,P4,P0,P1); //est
+            addQuad(P7,P6,P2,P3); //ouest
+            break;
+        case 11:
+            addQuad(P5,P4,P0,P1); //est
+            break;
+        case 12:
+            addQuad(P4,P7,P3,P0); //sud
+            addQuad(P7,P6,P2,P3); //ouest
+            break;
+        case 13:
+            addQuad(P4,P7,P3,P0); //sud
+            break;
+        case 14:
+            addQuad(P7,P6,P2,P3); //ouest
+            break;
+
+    }
+
+    //addQuad(P5,P4,P0,P1); //est
+    //addQuad(P4,P7,P3,P0); //sud
+    //addQuad(P7,P6,P2,P3); //ouest
+    //addQuad(P6,P5,P1,P2); //nord
 
     // ouverture du flux audio à placer dans le buffer
     buffer = alutCreateBufferFromFile(soundpathname.c_str());

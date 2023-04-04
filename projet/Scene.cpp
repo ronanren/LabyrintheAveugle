@@ -2,6 +2,7 @@
 #include <GL/gl.h>
 #include <GLFW/glfw3.h>
 
+#include <cstdio>
 #include <iostream>
 
 #include <AL/al.h>
@@ -13,13 +14,13 @@
 #include "Scene.h"
 
 /** constructeur */
-Scene::Scene()
+Scene::Scene(int** grid)
 {   
     int lenght = (std::end(m_Cube)-std::begin(m_Cube));
     // créer les objets à dessiner
     for (int x = 0; x < lenght; x++) {
         for (int y = 0; y < lenght; y++) {
-            m_Cube[x][y] = new Cube("data/white_noise.wav");
+            m_Cube[x][y] = new Cube("data/white_noise.wav", grid[x][y]);
             m_Cube[x][y]->setPosition(vec3::fromValues(0.0, 0.0, 0.0));
         }
     }
@@ -201,7 +202,7 @@ void Scene::onDrawFrame()
             m_Cube[x][y]->onRender(m_MatP, m_MatV);
             mat4::translate(m_MatV, m_MatV, vec3::fromValues(2.0, 0.0, 0.0));
         }
-        mat4::translate(m_MatV, m_MatV, vec3::fromValues(-8.0, 0.0, -2.0));
+        mat4::translate(m_MatV, m_MatV, vec3::fromValues(-8.0, 0.0, 2.0));
     }
 }
 

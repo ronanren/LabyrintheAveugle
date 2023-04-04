@@ -8,16 +8,17 @@ Labyrinthe::Labyrinthe(int largeur, int hauteur) {
     m_hauteur = hauteur;
 }
 
-void Labyrinthe::generer() {
+int** Labyrinthe::generer() {
     // Implementation de l'algo : https://weblog.jamisbuck.org/2011/2/3/maze-generation-sidewinder-algorithm
     std::cout << "Génération d'un labyrinthe de " << m_largeur << "x" << m_hauteur << std::endl;
     std::srand(std::time(nullptr));
 
-    int grid[m_largeur][m_hauteur];
+    int** grid = new int*[m_largeur];
     int cell;
 
     // initialisation du tableau
     for (int x = 0; x < m_largeur; x++) {
+        grid[x] = new int[m_hauteur];
         for (int y = 0; y < m_hauteur; y++) {
           grid[x][y] = 0;  
         }
@@ -48,4 +49,6 @@ void Labyrinthe::generer() {
         }
         std::cout << std::endl;
     }
+
+    return grid;
 }

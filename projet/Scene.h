@@ -44,7 +44,7 @@ private:
 public:
 
     /** constructeur, crée les objets 3D à dessiner */
-    Scene();
+    Scene(int**);
 
     /** destructeur, libère les ressources */
     ~Scene();

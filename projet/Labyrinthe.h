@@ -4,7 +4,7 @@
 class Labyrinthe {
 public:
     Labyrinthe(int largeur, int hauteur);
-    void generer();
+    int** generer();
 
 private:
     int m_largeur;
