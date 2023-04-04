@@ -8,7 +8,6 @@
 #include "libs/Light.h"
 
 #include "Cube.h"
-#include "Duck.h"
 #include "Ground.h"
 
 
@@ -18,7 +17,6 @@ private:
 
     // objets de la scène
     Cube* m_Cube;
-    Duck* m_Duck;
     Ground* m_Ground;
 
     // lampes

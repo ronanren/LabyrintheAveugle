@@ -87,14 +87,14 @@ Cube::Cube(std::string soundpathname): Mesh("cube")
     Vertex* P7 = new Vertex(this, -b, -b, +b);
 
     // couleurs
-    P0->setColor(0.0, 0.5, 1.0);  // P0 bleu
-    P1->setColor(1.0, 0.5, 0.0);  // P1 orange
-    P2->setColor(0.0, 0.7, 0.0);  // P2 vert foncé
-    P3->setColor(0.7, 0.0, 0.7);  // P3 violet
-    P4->setColor(0.0, 1.0, 1.0);  // P4 cyan
-    P5->setColor(0.5, 1.0, 0.0);  // P7 vert clair
-    P6->setColor(0.5, 0.0, 0.5);  // P5 magenta
-    P7->setColor(1.0, 1.0, 0.0);  // P6 jaune
+    P0->setColor(0.515, 0.179, 0.117);  // P0 couleur brique
+    P1->setColor(0.515, 0.179, 0.117);  // P1 couleur brique
+    P2->setColor(0.515, 0.179, 0.117);  // P2 couleur brique
+    P3->setColor(0.515, 0.179, 0.117);  // P3 couleur brique
+    P4->setColor(0.515, 0.179, 0.117);  // P4 couleur brique
+    P5->setColor(0.515, 0.179, 0.117);  // P7 couleur brique
+    P6->setColor(0.515, 0.179, 0.117);  // P5 couleur brique
+    P7->setColor(0.515, 0.179, 0.117);  // P6 couleur brique
 
     // quads
     //addQuad(P1,P0,P3,P2);
