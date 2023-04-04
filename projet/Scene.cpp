@@ -18,8 +18,7 @@ Scene::Scene()
 {
     // créer les objets à dessiner
     m_Cube = new Cube("data/white_noise.wav");
-    m_Cube->setPosition(vec3::fromValues(0.0, -0.5, -10.0));
-    m_Duck = new Duck();
+    m_Cube->setPosition(vec3::fromValues(0.0, 0.0, 0.0));
     m_Ground = new Ground();
 
     // caractéristiques de la lampe
@@ -179,7 +178,6 @@ void Scene::onDrawFrame()
 
     // fournir position et direction en coordonnées caméra aux objets éclairés
     m_Ground->setLight(m_Light);
-    m_Duck->setLight(m_Light);
 
 
     /** dessin de l'image **/
@@ -190,13 +188,9 @@ void Scene::onDrawFrame()
     // dessiner le sol
     m_Ground->onDraw(m_MatP, m_MatV);
 
+    mat4::translate(m_MatV, m_MatV, vec3::fromValues(0.0, 0.99, 0.0));
+
     m_Cube->onRender(m_MatP, m_MatV);
-
-    // dessiner le canard en mouvement
-    mat4::rotateY(m_MatV, m_MatV, -Utils::Time * 0.8);
-    mat4::translate(m_MatV, m_MatV, vec3::fromValues(1.0, 0.0, 0.0));
-    m_Duck->onRender(m_MatP, m_MatV);
-
 }
 
 
@@ -204,6 +198,5 @@ void Scene::onDrawFrame()
 Scene::~Scene()
 {
     delete m_Cube;
-    delete m_Duck;
     delete m_Ground;
 }

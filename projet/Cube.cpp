@@ -68,7 +68,7 @@ Cube::Cube(std::string soundpathname): Mesh("cube")
     setMaterials(m_Material);
 
     // maillage
-    const float b = 0.5;
+    const float b = 1;
 
     // sommets
     /*
@@ -77,14 +77,14 @@ Cube::Cube(std::string soundpathname): Mesh("cube")
          p7 |/___|/   p4
         p6          p5
     */
-    Vertex* P0 = new Vertex(this, +b, +2*b, +b);
-    Vertex* P1 = new Vertex(this, +b, +2*b, -b);
-    Vertex* P2 = new Vertex(this, -b, +2*b, -b);
-    Vertex* P3 = new Vertex(this, -b, +2*b, +b);
-    Vertex* P4 = new Vertex(this, +b, -2*b, +b);
-    Vertex* P5 = new Vertex(this, +b, -2*b, -b);
-    Vertex* P6 = new Vertex(this, -b, -2*b, -b);
-    Vertex* P7 = new Vertex(this, -b, -2*b, +b);
+    Vertex* P0 = new Vertex(this, +b, +b, +b);
+    Vertex* P1 = new Vertex(this, +b, +b, -b);
+    Vertex* P2 = new Vertex(this, -b, +b, -b);
+    Vertex* P3 = new Vertex(this, -b, +b, +b);
+    Vertex* P4 = new Vertex(this, +b, -b, +b);
+    Vertex* P5 = new Vertex(this, +b, -b, -b);
+    Vertex* P6 = new Vertex(this, -b, -b, -b);
+    Vertex* P7 = new Vertex(this, -b, -b, +b);
 
     // couleurs
     P0->setColor(0.0, 0.5, 1.0);  // P0 bleu
@@ -98,10 +98,10 @@ Cube::Cube(std::string soundpathname): Mesh("cube")
 
     // quads
     //addQuad(P1,P0,P3,P2);
-    //addQuad(P4,P5,P6,P7);
-    //addQuad(P5,P4,P0,P1);
+    addQuad(P4,P5,P6,P7);
+    addQuad(P5,P4,P0,P1);
     addQuad(P4,P7,P3,P0);
-    //addQuad(P7,P6,P2,P3);
+    addQuad(P7,P6,P2,P3);
     addQuad(P6,P5,P1,P2);
 
     // ouverture du flux audio à placer dans le buffer
