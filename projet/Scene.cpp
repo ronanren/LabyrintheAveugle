@@ -16,12 +16,11 @@
 /** constructeur */
 Scene::Scene(int** grid)
 {   
-    int lenght = (std::end(m_Cube)-std::begin(m_Cube));
     // créer les objets à dessiner
-    for (int x = 0; x < lenght; x++) {
-        for (int y = 0; y < lenght; y++) {
-            m_Cube[x][y] = new Cube("data/white_noise.wav", grid[x][y]);
-            m_Cube[x][y]->setPosition(vec3::fromValues(0.0, 0.0, 0.0));
+    for (int y = 0; y < hauteur; y++) {
+        for (int x = 0; x < largeur; x++) {
+            m_Cube[y][x] = new Cube("data/white_noise.wav", grid);
+            m_Cube[y][x]->setPosition(vec3::fromValues(0.0, 0.0, 0.0));
         }
     }
     m_Ground = new Ground();
@@ -154,7 +153,6 @@ void Scene::onKeyDown(unsigned char code)
     vec3::add(m_Center, m_Center, offset);
 }
 
-
 /**
  * Dessine l'image courante
  */
@@ -175,7 +173,6 @@ void Scene::onDrawFrame()
     // centre des rotations
     mat4::translate(m_MatV, m_MatV, m_Center);
 
-
     /** gestion des lampes **/
 
     // calculer la position et la direction de la lampe par rapport à la scène
@@ -183,7 +180,6 @@ void Scene::onDrawFrame()
 
     // fournir position et direction en coordonnées caméra aux objets éclairés
     m_Ground->setLight(m_Light);
-
 
     /** dessin de l'image **/
 
@@ -195,26 +191,21 @@ void Scene::onDrawFrame()
 
     mat4::translate(m_MatV, m_MatV, vec3::fromValues(0.0, 0.99, 0.0));
 
-    int lenght = (std::end(m_Cube)-std::begin(m_Cube));
-
-    for (int x = 0; x < lenght; x++) {
-        for (int y = 0; y < lenght; y++) {
-            m_Cube[x][y]->onRender(m_MatP, m_MatV);
+    for (int y = 0; y < hauteur; y++) {
+        for (int x = 0; x < largeur; x++) {
+            m_Cube[y][x]->onRender(m_MatP, m_MatV);
             mat4::translate(m_MatV, m_MatV, vec3::fromValues(2.0, 0.0, 0.0));
         }
-        mat4::translate(m_MatV, m_MatV, vec3::fromValues(-8.0, 0.0, 2.0));
+        mat4::translate(m_MatV, m_MatV, vec3::fromValues(-2.0 * largeur, 0.0, 2.0));
     }
 }
-
 
 /** supprime tous les objets de cette scène */
 Scene::~Scene()
 {   
-    int lenght = (std::end(m_Cube)-std::begin(m_Cube));
-
-    for (int x = 0; x < lenght; x++) {
-        for (int y = 0; y < lenght; y++) {
-            delete m_Cube[x][y];
+    for (int y = 0; y < hauteur; y++) {
+        for (int x = 0; x < largeur; x++) {
+            delete m_Cube[y][x];
         }
     }
     delete m_Ground;

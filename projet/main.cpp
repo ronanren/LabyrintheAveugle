@@ -145,8 +145,8 @@ int main(int argc,char **argv)
     alListener3f(AL_VELOCITY, 0, 0, 0);
 
     // génération du labyrinthe aléatoire
-    Labyrinthe labyrinthe(4, 4);
-    int ** grid = labyrinthe.generer();
+    Labyrinthe labyrinthe(largeur, hauteur);
+    labyrinthe.generer();
 
     // création de la scène => création des objets...
     scene = new Scene(grid);
