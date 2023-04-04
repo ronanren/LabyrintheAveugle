@@ -12,13 +12,15 @@
 
 #include "Scene.h"
 
-
 /** constructeur */
 Scene::Scene()
-{
+{   
+    int lenght = (std::end(m_Cube)-std::begin(m_Cube));
     // créer les objets à dessiner
-    m_Cube = new Cube("data/white_noise.wav");
-    m_Cube->setPosition(vec3::fromValues(0.0, 0.0, 0.0));
+    for (int i = 0; i < lenght; i++) {
+        m_Cube[i] = new Cube("data/white_noise.wav");
+        m_Cube[i]->setPosition(vec3::fromValues(0.0, 0.0, 0.0));
+    }
     m_Ground = new Ground();
 
     // caractéristiques de la lampe
@@ -190,13 +192,22 @@ void Scene::onDrawFrame()
 
     mat4::translate(m_MatV, m_MatV, vec3::fromValues(0.0, 0.99, 0.0));
 
-    m_Cube->onRender(m_MatP, m_MatV);
+    int lenght = (std::end(m_Cube)-std::begin(m_Cube));
+
+    for (int i = 0; i < lenght; i++) {
+        m_Cube[i]->onRender(m_MatP, m_MatV);
+        mat4::translate(m_MatV, m_MatV, vec3::fromValues(2.0, 0.0, 0.0));
+    }
 }
 
 
 /** supprime tous les objets de cette scène */
 Scene::~Scene()
-{
-    delete m_Cube;
+{   
+    int lenght = (std::end(m_Cube)-std::begin(m_Cube));
+
+    for (int i = 0; i < lenght; i++) {
+        delete m_Cube[i];
+    }
     delete m_Ground;
 }

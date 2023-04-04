@@ -11,14 +11,14 @@
 #include "Duck.h"
 #include "Ground.h"
 
+const int size = 16;
 
 class Scene
 {
 private:
 
     // objets de la scène
-    Cube* m_Cube;
-    Duck* m_Duck;
+    Cube* m_Cube[size];
     Ground* m_Ground;
 
     // lampes
