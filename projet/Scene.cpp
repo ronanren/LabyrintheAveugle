@@ -17,10 +17,10 @@
 Scene::Scene(int** grid)
 {   
     // créer les objets à dessiner
-    for (int y = 0; y < hauteur; y++) {
-        for (int x = 0; x < largeur; x++) {
-            m_Cube[y][x] = new Cube("data/white_noise.wav", grid);
-            m_Cube[y][x]->setPosition(vec3::fromValues(0.0, 0.0, 0.0));
+    for (int x = 0; x < hauteur; x++) {
+        for (int y = 0; y < largeur; y++) {
+            m_Cube[x][y] = new Cube("data/white_noise.wav", grid[x][y]);
+            m_Cube[x][y]->setPosition(vec3::fromValues(0.0, 0.0, 0.0));
         }
     }
     m_Ground = new Ground();
@@ -191,9 +191,9 @@ void Scene::onDrawFrame()
 
     mat4::translate(m_MatV, m_MatV, vec3::fromValues(0.0, 0.99, 0.0));
 
-    for (int y = 0; y < hauteur; y++) {
-        for (int x = 0; x < largeur; x++) {
-            m_Cube[y][x]->onRender(m_MatP, m_MatV);
+    for (int x = 0; x < hauteur; x++) {
+        for (int y = 0; y < largeur; y++) {
+            m_Cube[x][y]->onRender(m_MatP, m_MatV);
             mat4::translate(m_MatV, m_MatV, vec3::fromValues(2.0, 0.0, 0.0));
         }
         mat4::translate(m_MatV, m_MatV, vec3::fromValues(-2.0 * largeur, 0.0, 2.0));
@@ -203,9 +203,9 @@ void Scene::onDrawFrame()
 /** supprime tous les objets de cette scène */
 Scene::~Scene()
 {   
-    for (int y = 0; y < hauteur; y++) {
-        for (int x = 0; x < largeur; x++) {
-            delete m_Cube[y][x];
+    for (int x = 0; x < hauteur; x++) {
+        for (int y = 0; y < largeur; y++) {
+            delete m_Cube[x][y];
         }
     }
     delete m_Ground;

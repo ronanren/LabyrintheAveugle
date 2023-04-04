@@ -146,7 +146,7 @@ int main(int argc,char **argv)
 
     // génération du labyrinthe aléatoire
     Labyrinthe labyrinthe(largeur, hauteur);
-    labyrinthe.generer();
+    int** grid = labyrinthe.generer();
 
     // création de la scène => création des objets...
     scene = new Scene(grid);
