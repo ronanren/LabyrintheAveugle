@@ -8,7 +8,6 @@
 #include "libs/Light.h"
 
 #include "Cube.h"
-#include "Duck.h"
 #include "Ground.h"
 
 const int size = 16;
