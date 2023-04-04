@@ -9,7 +9,7 @@ Labyrinthe::Labyrinthe(int largeur, int hauteur) {
 }
 
 void Labyrinthe::generer() {
-    // afficher un message
+    // Implementation de l'algo : https://weblog.jamisbuck.org/2011/2/3/maze-generation-sidewinder-algorithm
     std::cout << "Génération d'un labyrinthe de " << m_largeur << "x" << m_hauteur << std::endl;
     std::srand(std::time(nullptr));
 
@@ -19,18 +19,19 @@ void Labyrinthe::generer() {
     // initialisation du tableau
     for (int x = 0; x < m_largeur; x++) {
         for (int y = 0; y < m_hauteur; y++) {
-          grid[x][y] = 0b0000;  
+          grid[x][y] = 0;  
         }
     }
-    
+    int run_start = 0;
     for(int y = 0; y < m_hauteur; y++){
-        int run_start = 0;
+        run_start = 0;
         for(int x = 0; x < m_largeur; x++){
             // creuse le nord
-            if (y > 0 && (x+1 == m_largeur || rand() % 2 == 0)){
+            if (y > 0 && (x+1 == m_largeur || (rand() % 2) == 0)){
                 cell = run_start + std::rand() % (x - run_start + 1);
                 grid[y][cell] |= 0b1000; // North
                 grid[y-1][cell] |= 0b0010; // South
+                run_start = x + 1;
             } // creuse l'est
             else if (x+1 < m_largeur){
                 grid[y][x] |= 0b0100; // Est
