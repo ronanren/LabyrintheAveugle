@@ -195,7 +195,7 @@ void Scene::onDrawFrame()
             m_Cube[y][x]->onRender(m_MatP, m_MatV);
             mat4::translate(m_MatV, m_MatV, vec3::fromValues(2.0, 0.0, 0.0));
         }
-        mat4::translate(m_MatV, m_MatV, vec3::fromValues(-8.0, 0.0, -2.0));
+        mat4::translate(m_MatV, m_MatV, vec3::fromValues(-2.0 * largeur, 0.0, -2.0));
     }
 }
 

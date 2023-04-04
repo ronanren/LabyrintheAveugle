@@ -1,2 +1,2 @@
-const int largeur = 4;
-const int hauteur = 4;
+const int largeur = 10;
+const int hauteur = 5;
