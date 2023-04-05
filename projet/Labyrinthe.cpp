@@ -17,12 +17,14 @@ int** Labyrinthe::generer() {
     int cell;
 
     // initialisation du tableau
-    for (int x = 0; x < m_largeur; x++) {
-        grid[x] = new int[m_hauteur];
-        for (int y = 0; y < m_hauteur; y++) {
-          grid[x][y] = 0;  
+    for (int y = 0; y < m_hauteur; y++) {
+        grid[y] = new int[m_hauteur];
+        for (int x = 0; x < m_largeur; x++) {
+          grid[y][x] = 0;
         }
     }
+
+    // Sidewinder Algorithm
     int run_start = 0;
     for(int y = 0; y < m_hauteur; y++){
         run_start = 0;

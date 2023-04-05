@@ -16,21 +16,22 @@
 /** constructeur */
 Scene::Scene(int** grid)
 {   
-    // créer les objets à dessiner
+    // Création du sol
+    m_Ground = new Ground();
+
+    // création des cubes (murs)
     for (int x = 0; x < hauteur; x++) {
         for (int y = 0; y < largeur; y++) {
             m_Cube[x][y] = new Cube("data/white_noise.wav", grid[x][y]);
-            m_Cube[x][y]->setPosition(vec3::fromValues(0.0, 0.0, 0.0));
         }
     }
-    m_Ground = new Ground();
 
     // caractéristiques de la lampe
     m_Light = new Light();
-    m_Light->setColor(500.0, 500.0, 500.0);
-    m_Light->setPosition(0.0,  16.0,  13.0, 1.0);
-    m_Light->setDirection(0.0, -1.0, -1.0, 0.0);
-    m_Light->setAngles(30.0, 40.0);
+    m_Light->setColor(20000.0, 20000.0, 20000.0);
+    m_Light->setPosition(0.0,  200.0,  0.0, 1.0);
+    m_Light->setDirection(0.0, -1.0, 0.0, 0.0);
+    // m_Light->setAngles(0.0, 0.0);
 
     // couleur du fond : gris foncé
     glClearColor(0.4, 0.4, 0.4, 0.0);
@@ -46,9 +47,9 @@ Scene::Scene(int** grid)
     m_MatTMP = mat4::create();
 
     // gestion vue et souris
-    m_Azimut    = 20.0;
-    m_Elevation = 20.0;
-    m_Distance  = 10.0;
+    m_Azimut    = 0.0;
+    m_Elevation = 80.0;
+    m_Distance  = 50.0;
     m_Center    = vec3::create();
     m_Clicked   = false;
 }
@@ -65,7 +66,7 @@ void Scene::onSurfaceChanged(int width, int height)
     glViewport(0, 0, width, height);
 
     // matrice de projection (champ de vision)
-    mat4::perspective(m_MatP, Utils::radians(25.0), (float)width / height, 0.1, 100.0);
+    mat4::perspective(m_MatP, Utils::radians(30.0), (float)width / height, 0.1, 1000.0);
 }
 
 
@@ -191,12 +192,19 @@ void Scene::onDrawFrame()
 
     mat4::translate(m_MatV, m_MatV, vec3::fromValues(0.0, 0.99, 0.0));
 
+    // affichage du point en (0,0)
+    glPointSize(5.0);
+    glBegin(GL_POINTS);
+    glVertex2f(0.0, 0.0);
+    glEnd();
+
+    // Dessiner et modifier la position des cubes (murs)
     for (int x = 0; x < hauteur; x++) {
         for (int y = 0; y < largeur; y++) {
             m_Cube[x][y]->onRender(m_MatP, m_MatV);
-            mat4::translate(m_MatV, m_MatV, vec3::fromValues(2.0, 0.0, 0.0));
+            mat4::translate(m_MatV, m_MatV, vec3::fromValues(largeur_cube * 2.0, 0.0, 0.0));
         }
-        mat4::translate(m_MatV, m_MatV, vec3::fromValues(-2.0 * largeur, 0.0, 2.0));
+        mat4::translate(m_MatV, m_MatV, vec3::fromValues(largeur_cube * -2.0 * largeur, 0.0, largeur_cube * 2.0));
     }
 }
 

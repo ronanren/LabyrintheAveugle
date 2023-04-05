@@ -15,6 +15,7 @@
 
 #include <Cube.h>
 #include <Material.h>
+#include "Constants.h"
 
 using namespace mesh;
 
@@ -68,7 +69,7 @@ Cube::Cube(std::string soundpathname, int walls): Mesh("cube")
     setMaterials(m_Material);
 
     // maillage
-    const float b = 1;
+    const float b = largeur_cube;
 
     // sommets
     /*
@@ -160,35 +161,30 @@ Cube::Cube(std::string soundpathname, int walls): Mesh("cube")
 
     }
 
-    //addQuad(P5,P4,P0,P1); //est
-    //addQuad(P4,P7,P3,P0); //sud
-    //addQuad(P7,P6,P2,P3); //ouest
-    //addQuad(P6,P5,P1,P2); //nord
-
     // ouverture du flux audio à placer dans le buffer
-    buffer = alutCreateBufferFromFile(soundpathname.c_str());
-    if (buffer == AL_NONE) {
-        std::cerr << "unable to open file " << soundpathname << std::endl;
-        alGetError();
-        throw std::runtime_error("file not found or not readable");
-    }
+    // buffer = alutCreateBufferFromFile(soundpathname.c_str());
+    // if (buffer == AL_NONE) {
+    //     std::cerr << "unable to open file " << soundpathname << std::endl;
+    //     alGetError();
+    //     throw std::runtime_error("file not found or not readable");
+    // }
 
-    // lien buffer -> source
-    alGenSources(1, &source);
-    alSourcei(source, AL_BUFFER, buffer);
+    // // lien buffer -> source
+    // alGenSources(1, &source);
+    // alSourcei(source, AL_BUFFER, buffer);
 
-    // propriétés de la source à l'origine
-    alSource3f(source, AL_POSITION, 0, 0, 0); // on positionne la source à (0,0,0) par défaut
-    alSource3f(source, AL_VELOCITY, 0, 0, 0);
-    alSourcei(source, AL_LOOPING, AL_TRUE);
-    // dans un cone d'angle [-inner/2,inner/2] il n'y a pas d'attenuation
-    alSourcef(source, AL_CONE_INNER_ANGLE, 20);
-    // dans un cone d'angle [-outer/2,outer/2] il y a une attenuation linéaire entre 0 et le gain
-    alSourcef(source, AL_CONE_OUTER_GAIN, 0);
-    alSourcef(source, AL_CONE_OUTER_ANGLE, 80);
-    // à l'extérieur de [-outer/2,outer/2] il y a une attenuation totale
+    // // propriétés de la source à l'origine
+    // alSource3f(source, AL_POSITION, 0, 0, 0); // on positionne la source à (0,0,0) par défaut
+    // alSource3f(source, AL_VELOCITY, 0, 0, 0);
+    // alSourcei(source, AL_LOOPING, AL_TRUE);
+    // // dans un cone d'angle [-inner/2,inner/2] il n'y a pas d'attenuation
+    // alSourcef(source, AL_CONE_INNER_ANGLE, 20);
+    // // dans un cone d'angle [-outer/2,outer/2] il y a une attenuation linéaire entre 0 et le gain
+    // alSourcef(source, AL_CONE_OUTER_GAIN, 0);
+    // alSourcef(source, AL_CONE_OUTER_ANGLE, 80);
+    // // à l'extérieur de [-outer/2,outer/2] il y a une attenuation totale
 
-    alSourcePlay(source);
+    // alSourcePlay(source);
 }
 
 

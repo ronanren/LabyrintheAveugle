@@ -150,7 +150,6 @@ int main(int argc,char **argv)
 
     // création de la scène => création des objets...
     scene = new Scene(grid);
-    //debugGLFatal("new Scene()");
 
     // enregistrement des fonctions callbacks
     glfwSetFramebufferSizeCallback(window, onSurfaceChanged);
