@@ -190,7 +190,7 @@ void Scene::onDrawFrame()
     // dessiner le sol
     m_Ground->onDraw(m_MatP, m_MatV);
 
-    mat4::translate(m_MatV, m_MatV, vec3::fromValues(0.0, 0.99, 0.0));
+    mat4::translate(m_MatV, m_MatV, vec3::fromValues(0.0, largeur_cube - 0.01, 0.0));
 
     // affichage du point en (0,0)
     glPointSize(5.0);

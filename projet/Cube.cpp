@@ -98,8 +98,8 @@ Cube::Cube(std::string soundpathname, int walls): Mesh("cube")
     P7->setColor(0.515, 0.179, 0.117);  // P6 couleur brique
 
     // quads
-    //addQuad(P1,P0,P3,P2);
-    addQuad(P4,P5,P6,P7); //dessous
+    // addQuad(P1,P0,P3,P2); // face du dessus
+    // addQuad(P4,P5,P6,P7); // face du dessous
 
     switch (walls) {
         case 1:
