@@ -47,9 +47,9 @@ Scene::Scene(int** grid)
     m_MatTMP = mat4::create();
 
     // gestion vue et souris
-    m_Azimut    = 0.0;
-    m_Elevation = 80.0;
-    m_Distance  = 50.0;
+    m_Azimut    = 90.0;
+    m_Elevation = largeur_cube/2;
+    m_Distance  = largeur_cube/2;
     m_Center    = vec3::create();
     m_Clicked   = false;
 }
@@ -187,16 +187,14 @@ void Scene::onDrawFrame()
     // effacer l'écran
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // translater la scène pour que le sol soit centré sur l'origine
+    mat4::translate(m_MatV, m_MatV, vec3::fromValues(hauteur * largeur_cube, 0.0, hauteur * largeur_cube));
+
     // dessiner le sol
     m_Ground->onDraw(m_MatP, m_MatV);
 
-    mat4::translate(m_MatV, m_MatV, vec3::fromValues(0.0, largeur_cube - 0.01, 0.0));
-
-    // affichage du point en (0,0)
-    glPointSize(5.0);
-    glBegin(GL_POINTS);
-    glVertex2f(0.0, 0.0);
-    glEnd();
+    // translater la scène pour que le point (0,0) soit au centre du sol et au milieu du premier cube
+    mat4::translate(m_MatV, m_MatV, vec3::fromValues(-hauteur * largeur_cube + largeur_cube, largeur_cube - 0.01, -hauteur * largeur_cube + largeur_cube));
 
     // Dessiner et modifier la position des cubes (murs)
     for (int x = 0; x < hauteur; x++) {
@@ -206,6 +204,12 @@ void Scene::onDrawFrame()
         }
         mat4::translate(m_MatV, m_MatV, vec3::fromValues(largeur_cube * -2.0 * largeur, 0.0, largeur_cube * 2.0));
     }
+
+    // affichage du point en (0,0)
+    glPointSize(5.0);
+    glBegin(GL_POINTS);
+    glVertex2f(0.0, 0.0);
+    glEnd();
 }
 
 /** supprime tous les objets de cette scène */

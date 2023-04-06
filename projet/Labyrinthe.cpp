@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+using namespace std;
 
 Labyrinthe::Labyrinthe(int largeur, int hauteur)
 {
@@ -12,8 +13,8 @@ Labyrinthe::Labyrinthe(int largeur, int hauteur)
 int **Labyrinthe::generer()
 {
     // Implementation de l'algo : https://weblog.jamisbuck.org/2011/2/3/maze-generation-sidewinder-algorithm
-    std::cout << "Génération d'un labyrinthe de " << m_largeur << "x" << m_hauteur << std::endl;
-    std::srand(std::time(nullptr));
+    cout << "Génération d'un labyrinthe de " << m_largeur << "x" << m_hauteur << endl;
+    srand(time(nullptr));
 
     int **grid = new int *[m_largeur];
     int cell;
@@ -57,9 +58,10 @@ int **Labyrinthe::generer()
     {
         for (int x = 0; x < m_largeur; x++)
         {
-            std::cout << grid[y][x] << " ";
+            cout.width(2);
+            cout << grid[y][x] << " ";
         }
-        std::cout << std::endl;
+        cout << endl;
     }
 
     return grid;
