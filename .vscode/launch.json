@@ -1,0 +1,46 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C++ Build and Run",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/projet/main",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/projet/",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "build"
+    },
+    {
+      "name": "C++ Run",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/projet/main",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/projet/",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
