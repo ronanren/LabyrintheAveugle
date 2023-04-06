@@ -14,14 +14,16 @@
 #include "Scene.h"
 
 /** constructeur */
-Scene::Scene(int** grid)
-{   
+Scene::Scene(int **grid)
+{
     // Création du sol
     m_Ground = new Ground();
 
     // création des cubes (murs)
-    for (int x = 0; x < hauteur; x++) {
-        for (int y = 0; y < largeur; y++) {
+    for (int x = 0; x < hauteur; x++)
+    {
+        for (int y = 0; y < largeur; y++)
+        {
             m_Cube[x][y] = new Cube("data/white_noise.wav", grid[x][y]);
         }
     }
@@ -29,7 +31,7 @@ Scene::Scene(int** grid)
     // caractéristiques de la lampe
     m_Light = new Light();
     m_Light->setColor(20000.0, 20000.0, 20000.0);
-    m_Light->setPosition(0.0,  200.0,  0.0, 1.0);
+    m_Light->setPosition(0.0, 200.0, 0.0, 1.0);
     m_Light->setDirection(0.0, -1.0, 0.0, 0.0);
     // m_Light->setAngles(0.0, 0.0);
 
@@ -41,19 +43,20 @@ Scene::Scene(int** grid)
     glDepthFunc(GL_LESS);
 
     // initialiser les matrices
-    m_MatP = mat4::create();
-    m_MatV = mat4::create();
-    m_MatVM = mat4::create();
-    m_MatTMP = mat4::create();
+    m_MatP = mat4::create();   // projection matrix, used to define the projection transformation for rendering 3D graphics onto a 2D screen
+    m_MatV = mat4::create();   // view matrix, used to define the view transformation for positioning and orienting the virtual camera in the 3D world
+    m_MatVM = mat4::create();  // view-model matrix, which is the combination of the view matrix and the model matrix.
+    m_MatTMP = mat4::create(); // temporary matrix used for temporary calculations or transformation
 
     // gestion vue et souris
-    m_Azimut    = 90.0;
-    m_Elevation = largeur_cube/2;
-    m_Distance  = largeur_cube/2;
-    m_Center    = vec3::create();
-    m_Clicked   = false;
+    m_Azimut = 90.0;
+    m_Elevation = 0.0;
+    m_Distance = largeur_cube;
+    m_Center = vec3::create();
+    // mettre le centre de la scene dans la premiere case du labyrinthe
+    vec3::set(m_Center, -largeur_cube, -largeur_cube, -largeur_cube);
+    m_Clicked = false;
 }
-
 
 /**
  * appelée quand la taille de la vue OpenGL change
@@ -69,7 +72,6 @@ void Scene::onSurfaceChanged(int width, int height)
     mat4::perspective(m_MatP, Utils::radians(30.0), (float)width / height, 0.1, 1000.0);
 }
 
-
 /**
  * appelée quand on enfonce un bouton de la souris
  * @param btn : GLFW_MOUSE_BUTTON_LEFT pour le bouton gauche
@@ -78,12 +80,12 @@ void Scene::onSurfaceChanged(int width, int height)
  */
 void Scene::onMouseDown(int btn, double x, double y)
 {
-    if (btn != GLFW_MOUSE_BUTTON_LEFT) return;
+    if (btn != GLFW_MOUSE_BUTTON_LEFT)
+        return;
     m_Clicked = true;
     m_MousePrecX = x;
     m_MousePrecY = y;
 }
-
 
 /**
  * appelée quand on relache un bouton de la souris
@@ -96,7 +98,6 @@ void Scene::onMouseUp(int btn, double x, double y)
     m_Clicked = false;
 }
 
-
 /**
  * appelée quand on bouge la souris
  * @param x coordonnée horizontale relative à la fenêtre
@@ -104,15 +105,17 @@ void Scene::onMouseUp(int btn, double x, double y)
  */
 void Scene::onMouseMove(double x, double y)
 {
-    if (! m_Clicked) return;
-    m_Azimut  += (x - m_MousePrecX) * 0.1;
+    if (!m_Clicked)
+        return;
+    m_Azimut += (x - m_MousePrecX) * 0.1;
     m_Elevation += (y - m_MousePrecY) * 0.1;
-    if (m_Elevation >  90.0) m_Elevation =  90.0;
-    if (m_Elevation < -90.0) m_Elevation = -90.0;
+    if (m_Elevation > 90.0)
+        m_Elevation = 90.0;
+    if (m_Elevation < -90.0)
+        m_Elevation = -90.0;
     m_MousePrecX = x;
     m_MousePrecY = y;
 }
-
 
 /**
  * appelée quand on appuie sur une touche du clavier
@@ -127,31 +130,27 @@ void Scene::onKeyDown(unsigned char code)
 
     // vecteur indiquant le décalage à appliquer au pivot de la rotation
     vec3 offset = vec3::create();
-    switch (code) {
-    case GLFW_KEY_W: // avant
-        m_Distance *= exp(-0.01);
+    switch (code)
+    {
+    case GLFW_KEY_W: // touche avant Z
+        vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
+        vec3::add(m_Center, m_Center, offset);
         break;
-    case GLFW_KEY_S: // arrière
-        m_Distance *= exp(+0.01);
+    case GLFW_KEY_S: // touche arrière S
+        vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
+        vec3::add(m_Center, m_Center, offset);
         break;
-    case GLFW_KEY_A: // droite
-        vec3::transformMat4(offset, vec3::fromValues(+0.1, 0, 0), m_MatTMP);
+    case GLFW_KEY_D: // touche droite D
+        m_Azimut += degre_rotation_tete;
+        // vec3::transformMat4(offset, vec3::fromValues(-1, 0, 0), m_MatTMP);
         break;
-    case GLFW_KEY_D: // gauche
-        vec3::transformMat4(offset, vec3::fromValues(-0.1, 0, 0), m_MatTMP);
-        break;
-    case GLFW_KEY_Q: // haut
-        vec3::transformMat4(offset, vec3::fromValues(0, -0.1, 0), m_MatTMP);
-        break;
-    case GLFW_KEY_Z: // bas
-        vec3::transformMat4(offset, vec3::fromValues(0, +0.1, 0), m_MatTMP);
+    case GLFW_KEY_A: // touche gauche S
+        m_Azimut -= degre_rotation_tete;
+        // vec3::transformMat4(offset, vec3::fromValues(+1, 0, 0), m_MatTMP);
         break;
     default:
         return;
     }
-
-    // appliquer le décalage au centre de la rotation
-    vec3::add(m_Center, m_Center, offset);
 }
 
 /**
@@ -197,8 +196,10 @@ void Scene::onDrawFrame()
     mat4::translate(m_MatV, m_MatV, vec3::fromValues(-hauteur * largeur_cube + largeur_cube, largeur_cube - 0.01, -hauteur * largeur_cube + largeur_cube));
 
     // Dessiner et modifier la position des cubes (murs)
-    for (int x = 0; x < hauteur; x++) {
-        for (int y = 0; y < largeur; y++) {
+    for (int x = 0; x < hauteur; x++)
+    {
+        for (int y = 0; y < largeur; y++)
+        {
             m_Cube[x][y]->onRender(m_MatP, m_MatV);
             mat4::translate(m_MatV, m_MatV, vec3::fromValues(largeur_cube * 2.0, 0.0, 0.0));
         }
@@ -214,9 +215,11 @@ void Scene::onDrawFrame()
 
 /** supprime tous les objets de cette scène */
 Scene::~Scene()
-{   
-    for (int x = 0; x < hauteur; x++) {
-        for (int y = 0; y < largeur; y++) {
+{
+    for (int x = 0; x < hauteur; x++)
+    {
+        for (int y = 0; y < largeur; y++)
+        {
             delete m_Cube[x][y];
         }
     }

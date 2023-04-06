@@ -160,8 +160,11 @@ int main(int argc,char **argv)
 
     // affichage du mode d'emploi
     std::cout << "Usage:" << std::endl;
-    std::cout << "Left button to rotate object" << std::endl;
-    std::cout << "Q,D (axis x) A,W (axis y) Z,S (axis z) keys to move" << std::endl;
+    std::cout << "Use the following keys to move:\n";
+    std::cout << "Z: Move forward\n";
+    std::cout << "Q: Move left\n";
+    std::cout << "S: Move back\n";
+    std::cout << "D: Move right\n";
 
     // boucle principale
     onSurfaceChanged(window, 640,480);
