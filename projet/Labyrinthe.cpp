@@ -22,7 +22,7 @@ int **Labyrinthe::generer()
     // initialisation du tableau
     for (int y = 0; y < m_hauteur; y++)
     {
-        grid[y] = new int[m_hauteur];
+        grid[y] = new int[m_largeur];
         for (int x = 0; x < m_largeur; x++)
         {
             grid[y][x] = 0;

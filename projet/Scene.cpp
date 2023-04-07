@@ -193,7 +193,7 @@ void Scene::onDrawFrame()
     m_Ground->onDraw(m_MatP, m_MatV);
 
     // translater la scène pour que le point (0,0) soit au centre du sol et au milieu du premier cube
-    mat4::translate(m_MatV, m_MatV, vec3::fromValues(-hauteur * largeur_cube + largeur_cube, largeur_cube - 0.01, -hauteur * largeur_cube + largeur_cube));
+    mat4::translate(m_MatV, m_MatV, vec3::fromValues(-largeur * largeur_cube + largeur_cube, largeur_cube - 0.01, -hauteur * largeur_cube + largeur_cube));
 
     // Dessiner et modifier la position des cubes (murs)
     for (int x = 0; x < hauteur; x++)
