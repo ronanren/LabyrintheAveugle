@@ -56,6 +56,8 @@ Scene::Scene(int **grid)
     // mettre le centre de la scene dans la premiere case du labyrinthe
     vec3::set(m_Center, -largeur_cube, -largeur_cube, -largeur_cube);
     m_Clicked = false;
+    m_debug =false;
+    m_dir = 'f';
 }
 
 /**
@@ -123,31 +125,97 @@ void Scene::onMouseMove(double x, double y)
  */
 void Scene::onKeyDown(unsigned char code)
 {
-    // construire la matrice inverse de l'orientation de la vue à la souris
-    mat4::identity(m_MatTMP);
-    mat4::rotateY(m_MatTMP, m_MatTMP, Utils::radians(-m_Azimut));
-    mat4::rotateX(m_MatTMP, m_MatTMP, Utils::radians(-m_Elevation));
+    if(m_debug){
+        //construire la matrice inverse de l'orientation de la vue à la souris
+        mat4::identity(m_MatTMP);
+        mat4::rotateY(m_MatTMP, m_MatTMP, Utils::radians(-m_Azimut));
+        mat4::rotateX(m_MatTMP, m_MatTMP, Utils::radians(-m_Elevation));
+    }
 
     // vecteur indiquant le décalage à appliquer au pivot de la rotation
     vec3 offset = vec3::create();
     switch (code)
     {
     case GLFW_KEY_W: // touche avant Z
-        vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
+        if(m_debug)vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
+        else {
+            switch (m_dir) {
+                case 'f' :
+                    vec3::transformMat4(offset, vec3::fromValues(-vitesse_marche, 0, 0), m_MatTMP);
+                    break;
+                case 'r' :
+                    vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
+                    break;
+                case 'b' :
+                    vec3::transformMat4(offset, vec3::fromValues(+vitesse_marche, 0, 0), m_MatTMP);
+                    break;
+                case 'l' :
+                    vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
+                    break;
+            }
+        }
         vec3::add(m_Center, m_Center, offset);
         break;
     case GLFW_KEY_S: // touche arrière S
-        vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
+        if(m_debug)vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
+        else {
+            switch (m_dir) {
+                case 'f' :
+                    vec3::transformMat4(offset, vec3::fromValues(+vitesse_marche, 0, 0), m_MatTMP);
+                    break;
+                case 'r' :
+                    vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
+                    break;
+                case 'b' :
+                    vec3::transformMat4(offset, vec3::fromValues(-vitesse_marche, 0, 0), m_MatTMP);
+                    break;
+                case 'l' :
+                    vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
+                    break;
+            }
+        }
         vec3::add(m_Center, m_Center, offset);
         break;
     case GLFW_KEY_D: // touche droite D
         m_Azimut += degre_rotation_tete;
+        switch (m_dir) {
+            case 'f' :
+                m_dir = 'r';
+                break;
+            case 'r' :
+                m_dir = 'b';
+                break;
+            case 'b' :
+                m_dir = 'l';
+                break;
+            case 'l' :
+                m_dir = 'f';
+                break;
+        }
         // vec3::transformMat4(offset, vec3::fromValues(-1, 0, 0), m_MatTMP);
         break;
-    case GLFW_KEY_A: // touche gauche S
+    case GLFW_KEY_A: // touche gauche Q
         m_Azimut -= degre_rotation_tete;
+                switch (m_dir) {
+            case 'f' :
+                m_dir = 'l';
+                break;
+            case 'l' :
+                m_dir = 'b';
+                break;
+            case 'b' :
+                m_dir = 'r';
+                break;
+            case 'r' :
+                m_dir = 'f';
+                break;
+        }
         // vec3::transformMat4(offset, vec3::fromValues(+1, 0, 0), m_MatTMP);
         break;
+    case GLFW_KEY_Y:
+        if(m_debug) m_debug = false;
+        else m_debug = true;
+        printf("%d",m_debug);
     default:
         return;
     }

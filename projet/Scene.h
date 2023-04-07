@@ -39,6 +39,9 @@ private:
     double m_MousePrecX;
     double m_MousePrecY;
 
+    bool m_debug;
+    char m_dir;
+
 
 public:
 
