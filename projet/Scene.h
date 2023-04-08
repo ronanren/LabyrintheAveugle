@@ -39,9 +39,10 @@ private:
     double m_MousePrecX;
     double m_MousePrecY;
 
+    // debug
     bool m_debug;
-    char m_dir;
-
+    vec3 lastPosition;
+    float lastAzimut;
 
 public:
 

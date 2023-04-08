@@ -160,6 +160,7 @@ int main(int argc,char **argv)
 
     // affichage du mode d'emploi
     std::cout << "Usage:" << std::endl;
+    std::cout << "Y: Show debug mode\n";
     std::cout << "Use the following keys to move:\n";
     std::cout << "Z: Move forward\n";
     std::cout << "Q: Move left\n";

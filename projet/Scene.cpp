@@ -53,11 +53,15 @@ Scene::Scene(int **grid)
     m_Elevation = 0.0;
     m_Distance = largeur_cube;
     m_Center = vec3::create();
+    m_Clicked = false;
+    m_debug = false;
+
     // mettre le centre de la scene dans la premiere case du labyrinthe
     vec3::set(m_Center, -largeur_cube, -largeur_cube, -largeur_cube);
-    m_Clicked = false;
-    m_debug =false;
-    m_dir = 'f';
+    // sauvegarder la position de la camera pour le debug
+    lastPosition = vec3::create();
+    vec3::copy(lastPosition, m_Center);
+    lastAzimut = m_Azimut;
 }
 
 /**
@@ -107,7 +111,7 @@ void Scene::onMouseUp(int btn, double x, double y)
  */
 void Scene::onMouseMove(double x, double y)
 {
-    if (!m_Clicked)
+    if (!m_Clicked || !m_debug)
         return;
     m_Azimut += (x - m_MousePrecX) * 0.1;
     m_Elevation += (y - m_MousePrecY) * 0.1;
@@ -125,100 +129,49 @@ void Scene::onMouseMove(double x, double y)
  */
 void Scene::onKeyDown(unsigned char code)
 {
-    if(m_debug){
-        //construire la matrice inverse de l'orientation de la vue à la souris
-        mat4::identity(m_MatTMP);
-        mat4::rotateY(m_MatTMP, m_MatTMP, Utils::radians(-m_Azimut));
-        mat4::rotateX(m_MatTMP, m_MatTMP, Utils::radians(-m_Elevation));
-    }
+    // construire la matrice inverse de l'orientation de la vue à la souris
+    mat4::identity(m_MatTMP);
+    mat4::rotateY(m_MatTMP, m_MatTMP, Utils::radians(-m_Azimut));
+    mat4::rotateX(m_MatTMP, m_MatTMP, Utils::radians(-m_Elevation));
 
     // vecteur indiquant le décalage à appliquer au pivot de la rotation
     vec3 offset = vec3::create();
     switch (code)
     {
     case GLFW_KEY_W: // touche avant Z
-        if(m_debug)vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
-        else {
-            switch (m_dir) {
-                case 'f' :
-                    vec3::transformMat4(offset, vec3::fromValues(-vitesse_marche, 0, 0), m_MatTMP);
-                    break;
-                case 'r' :
-                    vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
-                    break;
-                case 'b' :
-                    vec3::transformMat4(offset, vec3::fromValues(+vitesse_marche, 0, 0), m_MatTMP);
-                    break;
-                case 'l' :
-                    vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
-                    break;
-            }
-        }
+        vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
         break;
     case GLFW_KEY_S: // touche arrière S
-        if(m_debug)vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
-        else {
-            switch (m_dir) {
-                case 'f' :
-                    vec3::transformMat4(offset, vec3::fromValues(+vitesse_marche, 0, 0), m_MatTMP);
-                    break;
-                case 'r' :
-                    vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
-                    break;
-                case 'b' :
-                    vec3::transformMat4(offset, vec3::fromValues(-vitesse_marche, 0, 0), m_MatTMP);
-                    break;
-                case 'l' :
-                    vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
-                    break;
-            }
-        }
+        vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
         break;
     case GLFW_KEY_D: // touche droite D
         m_Azimut += degre_rotation_tete;
-        switch (m_dir) {
-            case 'f' :
-                m_dir = 'r';
-                break;
-            case 'r' :
-                m_dir = 'b';
-                break;
-            case 'b' :
-                m_dir = 'l';
-                break;
-            case 'l' :
-                m_dir = 'f';
-                break;
-        }
-        // vec3::transformMat4(offset, vec3::fromValues(-1, 0, 0), m_MatTMP);
         break;
-    case GLFW_KEY_A: // touche gauche Q
+    case GLFW_KEY_A: // touche gauche S
         m_Azimut -= degre_rotation_tete;
-                switch (m_dir) {
-            case 'f' :
-                m_dir = 'l';
-                break;
-            case 'l' :
-                m_dir = 'b';
-                break;
-            case 'b' :
-                m_dir = 'r';
-                break;
-            case 'r' :
-                m_dir = 'f';
-                break;
-        }
-        // vec3::transformMat4(offset, vec3::fromValues(+1, 0, 0), m_MatTMP);
         break;
     case GLFW_KEY_Y:
-        if(m_debug) m_debug = false;
-        else m_debug = true;
-        printf("%d",m_debug);
+        m_debug = !m_debug;
+        if (m_debug){
+            std::cout << "Debug mode" << std::endl << std::flush;
+            // sauvegarder la position de la camera pour le debug
+            vec3::copy(lastPosition, m_Center);
+            lastAzimut = m_Azimut;
+        } else {
+            std::cout << "Normal mode" << std::endl << std::flush;
+            // restaurer la position de la camera pour le debug
+            vec3::copy(m_Center, lastPosition);
+            // remettre la camera en position initiale
+            m_Azimut = lastAzimut;
+            m_Elevation = 0.0;
+        }
+        break;
     default:
         return;
     }
+    // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << std::endl << std::flush;
 }
 
 /**
