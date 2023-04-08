@@ -15,6 +15,8 @@ sudo apt install g++ mesa-utils libglew-dev libglfw3-dev libsdl2-dev libsdl2-ima
 make cleanalllibs && make main && make run
 ```
 
+Apprendre openGL : https://learnopengl.com/Introduction
+
 ## Rapport
 
 https://github.com/typst/typst

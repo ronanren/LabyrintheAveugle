@@ -12,10 +12,13 @@
 #include <libs/utils.h>
 
 #include "Scene.h"
+#include "Labyrinthe.h"
 
 /** constructeur */
 Scene::Scene(int **grid)
 {
+
+    m_grid = grid;
     // Création du sol
     m_Ground = new Ground();
 
@@ -58,6 +61,8 @@ Scene::Scene(int **grid)
 
     // mettre le centre de la scene dans la premiere case du labyrinthe
     vec3::set(m_Center, -largeur_cube, -largeur_cube, -largeur_cube);
+    last_maze_x = 0;
+    last_maze_y = 0;
     // sauvegarder la position de la camera pour le debug
     lastPosition = vec3::create();
     vec3::copy(lastPosition, m_Center);
@@ -75,7 +80,7 @@ void Scene::onSurfaceChanged(int width, int height)
     glViewport(0, 0, width, height);
 
     // matrice de projection (champ de vision)
-    mat4::perspective(m_MatP, Utils::radians(30.0), (float)width / height, 0.1, 1000.0);
+    mat4::perspective(m_MatP, Utils::radians(40.0), (float)width / height, 1.0, 1000.0);
 }
 
 /**
@@ -136,11 +141,26 @@ void Scene::onKeyDown(unsigned char code)
 
     // vecteur indiquant le décalage à appliquer au pivot de la rotation
     vec3 offset = vec3::create();
+    int maze_x; 
+    int maze_y;
+    int value_grid;
     switch (code)
     {
     case GLFW_KEY_W: // touche avant Z
         vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
+
+        maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
+        maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
+        std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
+        if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
+            vec3::subtract(m_Center, m_Center, offset);
+            std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
+        } else if (last_maze_y != maze_y || last_maze_x != maze_x){
+            Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
+            last_maze_x = maze_x;
+            last_maze_y = maze_y;
+        }
         break;
     case GLFW_KEY_S: // touche arrière S
         vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
@@ -163,7 +183,6 @@ void Scene::onKeyDown(unsigned char code)
             std::cout << "Normal mode" << std::endl << std::flush;
             // restaurer la position de la camera pour le debug
             vec3::copy(m_Center, lastPosition);
-            // remettre la camera en position initiale
             m_Azimut = lastAzimut;
             m_Elevation = 0.0;
         }
@@ -171,7 +190,6 @@ void Scene::onKeyDown(unsigned char code)
     default:
         return;
     }
-    // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << std::endl << std::flush;
 }
 
 /**
@@ -208,7 +226,7 @@ void Scene::onDrawFrame()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // translater la scène pour que le sol soit centré sur l'origine
-    mat4::translate(m_MatV, m_MatV, vec3::fromValues(hauteur * largeur_cube, 0.0, hauteur * largeur_cube));
+    mat4::translate(m_MatV, m_MatV, vec3::fromValues(largeur * largeur_cube, 0.0, hauteur * largeur_cube));
 
     // dessiner le sol
     m_Ground->onDraw(m_MatP, m_MatV);

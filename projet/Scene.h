@@ -15,6 +15,10 @@ class Scene
 {
 private:
 
+    int** m_grid;
+    int last_maze_x;
+    int last_maze_y;
+
     // objets de la scène
     Cube* m_Cube[hauteur][largeur];
     Ground* m_Ground;
