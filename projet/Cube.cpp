@@ -81,18 +81,31 @@ Cube::Cube(std::string soundpathname, int walls) : Mesh("cube")
     Vertex *P7 = new Vertex(this, -b, -b, +b);
 
     // couleurs
-    P0->setColor(0.515, 0.179, 0.117); // P0 couleur brique
-    P1->setColor(0.515, 0.179, 0.117); // P1 couleur brique
-    P2->setColor(0.515, 0.179, 0.117); // P2 couleur brique
-    P3->setColor(0.515, 0.179, 0.117); // P3 couleur brique
-    P4->setColor(0.515, 0.179, 0.117); // P4 couleur brique
-    P5->setColor(0.515, 0.179, 0.117); // P7 couleur brique
-    P6->setColor(0.515, 0.179, 0.117); // P5 couleur brique
-    P7->setColor(0.515, 0.179, 0.117); // P6 couleur brique
+    // couleurs
+    P0->setColor(0.498, 0.160, 0.101); // P0 couleur brique la plus foncée
+    P1->setColor(0.537, 0.176, 0.113); // P1 couleur brique légèrement plus claire
+    P2->setColor(0.576, 0.192, 0.125); // P2 couleur brique encore plus claire
+    P3->setColor(0.615, 0.208, 0.137); // P3 couleur brique encore plus claire
+    P4->setColor(0.654, 0.224, 0.149); // P4 couleur brique encore plus claire
+    P5->setColor(0.693, 0.240, 0.161); // P5 couleur brique encore plus claire
+    P6->setColor(0.732, 0.256, 0.173); // P6 couleur brique encore plus claire
+    P7->setColor(0.771, 0.272, 0.185); // P7 couleur brique la plus claire
+
+    // ouverture du flux audio à placer dans le buffer
+    buffer = alutCreateBufferFromFile(soundpathname.c_str());
+    if (buffer == AL_NONE) {
+         std::cerr << "unable to open file " << soundpathname << std::endl;
+         alGetError();
+         throw std::runtime_error("file not found or not readable");
+    }
 
     // quads
     // addQuad(P1,P0,P3,P2); // face du dessus
     addQuad(P4, P5, P6, P7); // face du dessous
+
+    float refDistance = 1.0f; // Distance de référence (où le son est le plus fort)
+    float maxDistance = 5.0f; // Distance maximale (où le son est inaudible)
+    float rolloffFactor = 2.0f; // Facteur de décroissance sonore
 
     if ((walls >=1) && (walls <= 3) || (walls >= 8) && (walls <= 11)){
         addQuad(P5, P4, P0, P1); // est
@@ -105,32 +118,18 @@ Cube::Cube(std::string soundpathname, int walls) : Mesh("cube")
     }
     if (walls % 2 == 0){
         addQuad(P7, P6, P2, P3); // west
+        // alGenSources(1, &source);
+        // alSourcei(source, AL_BUFFER, buffer);
+        // alSource3f(source, AL_POSITION, -b, 0.0f, 0.0f);
+        // alSourcei(source, AL_LOOPING, AL_TRUE); // Définition de la boucle
+        
+        // // Ajout du système d'atténuation sonore en fonction de la distance
+        // alSourcef(source, AL_REFERENCE_DISTANCE, refDistance);
+        // alSourcef(source, AL_MAX_DISTANCE, maxDistance);
+        // alSourcef(source, AL_ROLLOFF_FACTOR, rolloffFactor);
+
+        // alSourcePlay(source);
     }
-
-    // ouverture du flux audio à placer dans le buffer
-    // buffer = alutCreateBufferFromFile(soundpathname.c_str());
-    // if (buffer == AL_NONE) {
-    //     std::cerr << "unable to open file " << soundpathname << std::endl;
-    //     alGetError();
-    //     throw std::runtime_error("file not found or not readable");
-    // }
-
-    // // lien buffer -> source
-    // alGenSources(1, &source);
-    // alSourcei(source, AL_BUFFER, buffer);
-
-    // // propriétés de la source à l'origine
-    // alSource3f(source, AL_POSITION, 0, 0, 0); // on positionne la source à (0,0,0) par défaut
-    // alSource3f(source, AL_VELOCITY, 0, 0, 0);
-    // alSourcei(source, AL_LOOPING, AL_TRUE);
-    // // dans un cone d'angle [-inner/2,inner/2] il n'y a pas d'attenuation
-    // alSourcef(source, AL_CONE_INNER_ANGLE, 20);
-    // // dans un cone d'angle [-outer/2,outer/2] il y a une attenuation linéaire entre 0 et le gain
-    // alSourcef(source, AL_CONE_OUTER_GAIN, 0);
-    // alSourcef(source, AL_CONE_OUTER_ANGLE, 80);
-    // // à l'extérieur de [-outer/2,outer/2] il y a une attenuation totale
-
-    // alSourcePlay(source);
 }
 
 /**
@@ -146,6 +145,9 @@ void Cube::onRender(const mat4 &matP, const mat4 &matVM)
 
     /** sonorisation OpenAL **/
 
+    // gestion de l'atténuation sonore
+    // alSourcef(source, AL_GAIN, 1.0f / (1.0f + 10));
+    
     // obtenir la position relative à la caméra
     // vec4 pos = vec4::fromValues(0, 0, 0, 1); // point en (0,0,0)
     // vec4::transformMat4(pos, pos, matVM);
