@@ -80,7 +80,7 @@ void Scene::onSurfaceChanged(int width, int height)
     glViewport(0, 0, width, height);
 
     // matrice de projection (champ de vision)
-    mat4::perspective(m_MatP, Utils::radians(40.0), (float)width / height, 1.0, 1000.0);
+    mat4::perspective(m_MatP, Utils::radians(35.0), (float)width / height, 1.0, 1000.0);
 }
 
 /**
@@ -143,13 +143,11 @@ void Scene::onKeyDown(unsigned char code)
     vec3 offset = vec3::create();
     int maze_x; 
     int maze_y;
-    int value_grid;
     switch (code)
     {
     case GLFW_KEY_W: // touche avant Z
         vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
-
         maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
         maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
         std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
@@ -157,14 +155,37 @@ void Scene::onKeyDown(unsigned char code)
             vec3::subtract(m_Center, m_Center, offset);
             std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
         } else if (last_maze_y != maze_y || last_maze_x != maze_x){
-            Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
-            last_maze_x = maze_x;
-            last_maze_y = maze_y;
+            int res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
+            std::cout << "res = " << res << std::endl << std::flush;
+            if (res == 1){
+                vec3::subtract(m_Center, m_Center, offset);
+                std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
+            } else {
+                last_maze_x = maze_x;
+                last_maze_y = maze_y;
+            }
         }
         break;
     case GLFW_KEY_S: // touche arrière S
         vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
+        maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
+        maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
+        std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
+        if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
+            vec3::subtract(m_Center, m_Center, offset);
+            std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
+        } else if (last_maze_y != maze_y || last_maze_x != maze_x){
+            int res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
+            std::cout << "res = " << res << std::endl << std::flush;
+            if (res == 1){
+                vec3::subtract(m_Center, m_Center, offset);
+                std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
+            } else {
+                last_maze_x = maze_x;
+                last_maze_y = maze_y;
+            }
+        }
         break;
     case GLFW_KEY_D: // touche droite D
         m_Azimut += degre_rotation_tete;
