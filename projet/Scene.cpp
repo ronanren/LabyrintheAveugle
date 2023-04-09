@@ -56,11 +56,13 @@ Scene::Scene(int **grid)
     m_Elevation = 0.0;
     m_Distance = largeur_cube;
     m_Center = vec3::create();
+    last_Center = vec3::create();
     m_Clicked = false;
     m_debug = false;
 
     // mettre le centre de la scene dans la premiere case du labyrinthe
     vec3::set(m_Center, -largeur_cube, -largeur_cube, -largeur_cube);
+    vec3::set(last_Center, -largeur_cube, -largeur_cube, -largeur_cube);
     last_maze_x = 0;
     last_maze_y = 0;
     // sauvegarder la position de la camera pour le debug
@@ -148,42 +150,58 @@ void Scene::onKeyDown(unsigned char code)
     case GLFW_KEY_W: // touche avant Z
         vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
-        maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
-        maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
-        std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
+        if (last_Center[0] < m_Center[0])
+            maze_x = abs(floor( (m_Center[0] + rayon_collision) / (largeur_cube * 2) )) - 1;
+        if (last_Center[0] >= m_Center[0])
+            maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
+        if (last_Center[2] < m_Center[2])
+            maze_y = abs(floor( (m_Center[2] + rayon_collision) / (largeur_cube * 2) )) - 1;
+        if (last_Center[2] >= m_Center[2])
+            maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
+        
+        // std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
         if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
             vec3::subtract(m_Center, m_Center, offset);
             std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
         } else if (last_maze_y != maze_y || last_maze_x != maze_x){
             int res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
-            std::cout << "res = " << res << std::endl << std::flush;
+            // std::cout << "res = " << res << std::endl << std::flush;
             if (res == 1){
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
             } else {
                 last_maze_x = maze_x;
                 last_maze_y = maze_y;
+                vec3::copy(last_Center, m_Center);
             }
         }
         break;
     case GLFW_KEY_S: // touche arrière S
         vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
-        maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
-        maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
-        std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
+        if (last_Center[0] < m_Center[0])
+            maze_x = abs(floor( (m_Center[0] + rayon_collision) / (largeur_cube * 2) )) - 1;
+        if (last_Center[0] >= m_Center[0])
+            maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
+        if (last_Center[2] < m_Center[2])
+            maze_y = abs(floor( (m_Center[2] + rayon_collision) / (largeur_cube * 2) )) - 1;
+        if (last_Center[2] >= m_Center[2])
+            maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
+        
+        // std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
         if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
             vec3::subtract(m_Center, m_Center, offset);
             std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
         } else if (last_maze_y != maze_y || last_maze_x != maze_x){
             int res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
-            std::cout << "res = " << res << std::endl << std::flush;
+            // std::cout << "res = " << res << std::endl << std::flush;
             if (res == 1){
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
             } else {
                 last_maze_x = maze_x;
                 last_maze_y = maze_y;
+                vec3::copy(last_Center, m_Center);
             }
         }
         break;

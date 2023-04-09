@@ -37,6 +37,7 @@ private:
     float m_Elevation;
     float m_Distance;
     vec3 m_Center;
+    vec3 last_Center;
 
     // souris
     bool m_Clicked;
