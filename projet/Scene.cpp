@@ -38,9 +38,6 @@ Scene::Scene(int **grid)
     m_Light->setDirection(0.0, -1.0, 0.0, 0.0);
     // m_Light->setAngles(0.0, 0.0);
 
-    // couleur du fond : gris foncé
-    glClearColor(0.4, 0.4, 0.4, 0.0);
-
     // activer le depth buffer
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
