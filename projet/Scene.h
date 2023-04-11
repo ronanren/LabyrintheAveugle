@@ -25,7 +25,6 @@ private:
 
     // lampes
     Light* m_Light;
-    Light* m_Light2;
 
     // matrices de transformation des objets de la scène
     mat4 m_MatP;
