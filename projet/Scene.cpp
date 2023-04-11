@@ -38,8 +38,6 @@ Scene::Scene(int **grid)
     m_Light->setDirection(0.0, -1.0, 0.0, 0.0);
     // m_Light->setAngles(0.0, 0.0);
 
-    m_Light2 = new Light();
-
     // activer le depth buffer
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -261,7 +259,7 @@ void Scene::onDrawFrame()
 
     // fournir position et direction en coordonnées caméra aux objets éclairés
     if(m_debug)m_Ground->setLight(m_Light);
-    else m_Ground->setLight(m_Light2);
+    else m_Ground->setLight(nullptr);
 
     /** dessin de l'image **/
 
