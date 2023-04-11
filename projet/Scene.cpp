@@ -259,7 +259,6 @@ void Scene::onDrawFrame()
 
     // fournir position et direction en coordonnées caméra aux objets éclairés
     if(m_debug)m_Ground->setLight(m_Light);
-    else m_Ground->setLight(nullptr);
 
     /** dessin de l'image **/
 
