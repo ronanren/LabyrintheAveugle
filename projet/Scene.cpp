@@ -303,4 +303,5 @@ Scene::~Scene()
         }
     }
     delete m_Ground;
+    delete m_Light;
 }
