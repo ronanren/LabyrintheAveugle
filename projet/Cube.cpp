@@ -91,21 +91,36 @@ Cube::Cube(std::string soundpathname, int walls) : Mesh("cube")
     P6->setColor(0.732, 0.256, 0.173); // P6 couleur brique encore plus claire
     P7->setColor(0.771, 0.272, 0.185); // P7 couleur brique la plus claire
 
-    // ouverture du flux audio à placer dans le buffer
-    buffer = alutCreateBufferFromFile(soundpathname.c_str());
-    if (buffer == AL_NONE) {
-         std::cerr << "unable to open file " << soundpathname << std::endl;
-         alGetError();
-         throw std::runtime_error("file not found or not readable");
-    }
-
     // quads
     // addQuad(P1,P0,P3,P2); // face du dessus
     addQuad(P4, P5, P6, P7); // face du dessous
 
-    float refDistance = 1.0f; // Distance de référence (où le son est le plus fort)
-    float maxDistance = 5.0f; // Distance maximale (où le son est inaudible)
-    float rolloffFactor = 2.0f; // Facteur de décroissance sonore
+    // ouverture du flux audio à placer dans le buffer
+    // buffer = alutCreateBufferFromFile(soundpathname.c_str());
+    // if (buffer == AL_NONE) {
+    //     std::cerr << "unable to open file " << soundpathname << std::endl;
+    //     alGetError();
+    //     throw std::runtime_error("file not found or not readable");
+    // }
+
+    // // lien buffer -> source
+    // alGenSources(1, &source);
+    // alSourcei(source, AL_BUFFER, buffer);
+
+    // // propriétés de la source à l'origine
+    // alSource3f(source, AL_POSITION, 0, 1.0, 0); // on positionne la source à (0,1,0) par défaut
+    // alSource3f(source, AL_VELOCITY, 0, 0, 0);
+    // alSourcei(source, AL_LOOPING, AL_TRUE);
+    // // dans un cone d'angle [-inner/2,inner/2] il n'y a pas d'attenuation
+    // alSourcef(source, AL_CONE_INNER_ANGLE, 360);
+    // // dans un cone d'angle [-outer/2,outer/2] il y a une attenuation linéaire entre 0 et le gain
+    // alSourcef(source, AL_CONE_OUTER_GAIN, 1.0);
+    // alSourcef(source, AL_CONE_OUTER_ANGLE, 360);
+    // // à l'extérieur de [-outer/2,outer/2] il y a une attenuation totale
+    // // Set the reference distance to 1 meter
+    // alSourcef(source, AL_REFERENCE_DISTANCE, 1.1f);
+
+    // alSourcePlay(source);
 
     if ((walls >=1) && (walls <= 3) || (walls >= 8) && (walls <= 11)){
         addQuad(P5, P4, P0, P1); // est
@@ -118,17 +133,6 @@ Cube::Cube(std::string soundpathname, int walls) : Mesh("cube")
     }
     if (walls % 2 == 0){
         addQuad(P7, P6, P2, P3); // west
-        // alGenSources(1, &source);
-        // alSourcei(source, AL_BUFFER, buffer);
-        // alSource3f(source, AL_POSITION, -b, 0.0f, 0.0f);
-        // alSourcei(source, AL_LOOPING, AL_TRUE); // Définition de la boucle
-        
-        // // Ajout du système d'atténuation sonore en fonction de la distance
-        // alSourcef(source, AL_REFERENCE_DISTANCE, refDistance);
-        // alSourcef(source, AL_MAX_DISTANCE, maxDistance);
-        // alSourcef(source, AL_ROLLOFF_FACTOR, rolloffFactor);
-
-        // alSourcePlay(source);
     }
 }
 
@@ -145,19 +149,16 @@ void Cube::onRender(const mat4 &matP, const mat4 &matVM)
 
     /** sonorisation OpenAL **/
 
-    // gestion de l'atténuation sonore
-    // alSourcef(source, AL_GAIN, 1.0f / (1.0f + 10));
-    
     // obtenir la position relative à la caméra
-    // vec4 pos = vec4::fromValues(0, 0, 0, 1); // point en (0,0,0)
-    // vec4::transformMat4(pos, pos, matVM);
-    // // std::cout << "Position = " << vec4::str(pos);
-    // alSource3f(source, AL_POSITION, pos[0], pos[1], pos[2]);
+    vec4 pos = vec4::fromValues(0.0, 0.0, 0.0, 1.0); // point at (0,0,0,1)
+    vec4 dir = vec4::fromValues(0.0, 0.0, 1.0, 0.0); // vector pointing in +Z direction
 
-    // // obtenir la direction relative à la caméra
-    // vec4 dir = vec4::fromValues(0, 0, 1, 0); // vecteur +z
-    // vec4::transformMat4(dir, dir, matVM);
-    // // std::cout << "    Direction = " << vec4::str(dir) << std::endl;
+    // Transform the position and direction using the view matrix
+    vec4::transformMat4(pos, pos, matVM);
+    vec4::transformMat4(dir, dir, matVM);
+
+    // Update the sound source position and direction
+    // alSource3f(source, AL_POSITION, pos[0], pos[1], pos[2]);
     // alSource3f(source, AL_DIRECTION, dir[0], dir[1], dir[2]);
 }
 
