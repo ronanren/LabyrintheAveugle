@@ -96,31 +96,16 @@ Cube::Cube(std::string soundpathname, int walls) : Mesh("cube")
     addQuad(P4, P5, P6, P7); // face du dessous
 
     // ouverture du flux audio à placer dans le buffer
-    // buffer = alutCreateBufferFromFile(soundpathname.c_str());
-    // if (buffer == AL_NONE) {
-    //     std::cerr << "unable to open file " << soundpathname << std::endl;
-    //     alGetError();
-    //     throw std::runtime_error("file not found or not readable");
-    // }
+    buffer = alutCreateBufferFromFile(soundpathname.c_str());
+    if (buffer == AL_NONE) {
+        std::cerr << "unable to open file " << soundpathname << std::endl;
+        alGetError();
+        throw std::runtime_error("file not found or not readable");
+    }
 
-    // // lien buffer -> source
-    // alGenSources(1, &source);
-    // alSourcei(source, AL_BUFFER, buffer);
-
-    // // propriétés de la source à l'origine
-    // alSource3f(source, AL_POSITION, 0, 1.0, 0); // on positionne la source à (0,1,0) par défaut
-    // alSource3f(source, AL_VELOCITY, 0, 0, 0);
-    // alSourcei(source, AL_LOOPING, AL_TRUE);
-    // // dans un cone d'angle [-inner/2,inner/2] il n'y a pas d'attenuation
-    // alSourcef(source, AL_CONE_INNER_ANGLE, 360);
-    // // dans un cone d'angle [-outer/2,outer/2] il y a une attenuation linéaire entre 0 et le gain
-    // alSourcef(source, AL_CONE_OUTER_GAIN, 1.0);
-    // alSourcef(source, AL_CONE_OUTER_ANGLE, 360);
-    // // à l'extérieur de [-outer/2,outer/2] il y a une attenuation totale
-    // // Set the reference distance to 1 meter
-    // alSourcef(source, AL_REFERENCE_DISTANCE, 1.1f);
-
-    // alSourcePlay(source);
+    // lien buffer -> source
+    alGenSources(1, &source);
+    alSourcei(source, AL_BUFFER, buffer);    
 
     if ((walls >=1) && (walls <= 3) || (walls >= 8) && (walls <= 11)){
         addQuad(P5, P4, P0, P1); // est
@@ -134,6 +119,20 @@ Cube::Cube(std::string soundpathname, int walls) : Mesh("cube")
     if (walls % 2 == 0){
         addQuad(P7, P6, P2, P3); // west
     }
+
+    alSource3f(source, AL_POSITION, 0.0f, 0.0f, 0.0f);
+    // alSource3f(source, AL_VELOCITY, 1.0, 0.0, 0);
+
+    alSourcei(source, AL_LOOPING, AL_TRUE);
+    // // dans un cone d'angle [-inner/2,inner/2] il n'y a pas d'attenuation
+    // alSourcef(source, AL_CONE_INNER_ANGLE, 360);
+    // // dans un cone d'angle [-outer/2,outer/2] il y a une attenuation linéaire entre 0 et le gain
+    // alSourcef(source, AL_CONE_OUTER_GAIN, 1.0);
+    // alSourcef(source, AL_CONE_OUTER_ANGLE, 360);
+    // // à l'extérieur de [-outer/2,outer/2] il y a une attenuation totale
+    // // Set the reference distance to 1 meter
+    alSourcef(source, AL_REFERENCE_DISTANCE, 0.5f);
+    alSourcePlay(source);
 }
 
 /**
@@ -150,16 +149,14 @@ void Cube::onRender(const mat4 &matP, const mat4 &matVM)
     /** sonorisation OpenAL **/
 
     // obtenir la position relative à la caméra
-    vec4 pos = vec4::fromValues(0.0, 0.0, 0.0, 1.0); // point at (0,0,0,1)
-    vec4 dir = vec4::fromValues(0.0, 0.0, 1.0, 0.0); // vector pointing in +Z direction
-
-    // Transform the position and direction using the view matrix
+    vec4 pos = vec4::fromValues(0,0,0,1);   // point en (0,0,0)
     vec4::transformMat4(pos, pos, matVM);
-    vec4::transformMat4(dir, dir, matVM);
+    alSource3f(source, AL_POSITION, pos[0], pos[1], pos[2]);
 
-    // Update the sound source position and direction
-    // alSource3f(source, AL_POSITION, pos[0], pos[1], pos[2]);
-    // alSource3f(source, AL_DIRECTION, dir[0], dir[1], dir[2]);
+    // obtenir la direction relative à la caméra
+    vec4 dir = vec4::fromValues(0,0,1,0);   // vecteur +z
+    vec4::transformMat4(dir, dir, matVM);
+    alSource3f(source, AL_DIRECTION, dir[0], dir[1], dir[2]);
 }
 
 vec3 &Cube::getPosition()

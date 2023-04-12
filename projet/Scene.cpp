@@ -28,6 +28,9 @@ Scene::Scene(int **grid)
         for (int y = 0; y < largeur; y++)
         {
             m_Cube[x][y] = new Cube("data/white_noise.wav", grid[x][y]);
+            vec3 pos = vec3::create();
+            vec3::set(pos, x, 0, y);
+            m_Cube[x][y]->setPosition(pos);
         }
     }
 
@@ -147,6 +150,7 @@ void Scene::onKeyDown(unsigned char code)
     case GLFW_KEY_W: // touche avant Z
         vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
+        // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << std::endl << std::flush;
         if (!m_debug){
             if (last_Center[0] < m_Center[0])
                 maze_x = abs(floor( (m_Center[0] + rayon_collision) / (largeur_cube * 2) )) - 1;
@@ -157,7 +161,6 @@ void Scene::onKeyDown(unsigned char code)
             if (last_Center[2] >= m_Center[2])
                 maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
             
-            // std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
@@ -178,6 +181,7 @@ void Scene::onKeyDown(unsigned char code)
     case GLFW_KEY_S: // touche arrière S
         vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
+        // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << std::endl << std::flush;
         if (!m_debug){
             if (last_Center[0] < m_Center[0])
                 maze_x = abs(floor( (m_Center[0] + rayon_collision) / (largeur_cube * 2) )) - 1;
@@ -188,7 +192,6 @@ void Scene::onKeyDown(unsigned char code)
             if (last_Center[2] >= m_Center[2])
                 maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
             
-            // std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
