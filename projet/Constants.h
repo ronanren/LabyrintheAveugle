@@ -1,4 +1,4 @@
-const int largeur = 25;
+const int largeur = 10;
 const int hauteur = 10;
 const float largeur_cube = 1.0; // demi largeur d'un cube
 const float vitesse_marche = 0.2;
