@@ -162,9 +162,9 @@ void Scene::onKeyDown(unsigned char code)
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
-                int res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
+                bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
                 // std::cout << "res = " << res << std::endl << std::flush;
-                if (res == 1){
+                if (res){
                     vec3::subtract(m_Center, m_Center, offset);
                     std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
                 } else {
@@ -194,9 +194,9 @@ void Scene::onKeyDown(unsigned char code)
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
-                int res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
+                bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
                 // std::cout << "res = " << res << std::endl << std::flush;
-                if (res == 1){
+                if (res){
                     vec3::subtract(m_Center, m_Center, offset);
                     std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
                 } else {
@@ -315,4 +315,5 @@ Scene::~Scene()
         }
     }
     delete m_Ground;
+    delete m_Light;
 }
