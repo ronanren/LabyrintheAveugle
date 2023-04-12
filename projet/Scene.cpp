@@ -79,7 +79,7 @@ void Scene::onSurfaceChanged(int width, int height)
     glViewport(0, 0, width, height);
 
     // matrice de projection (champ de vision)
-    mat4::perspective(m_MatP, Utils::radians(35.0), (float)width / height, 1.0, 1000.0);
+    mat4::perspective(m_MatP, Utils::radians(35.0), (float)width / height, 1.0, 10.0);
 }
 
 /**
@@ -173,6 +173,7 @@ void Scene::onKeyDown(unsigned char code)
                     vec3::copy(last_Center, m_Center);
                 }
             }
+            if((maze_x == largeur - 1) && (maze_y == hauteur - 1))std::cout << "Win !" << std::endl << std::flush;
         }
         break;
     case GLFW_KEY_S: // touche arrière S
@@ -204,13 +205,22 @@ void Scene::onKeyDown(unsigned char code)
                     vec3::copy(last_Center, m_Center);
                 }
             }
+            if((maze_x == largeur - 1) && (maze_y == hauteur - 1))std::cout << "Win !" << std::endl << std::flush;
         }
         break;
     case GLFW_KEY_D: // touche droite D
-        m_Azimut += degre_rotation_tete;
+        if(m_debug){
+            vec3::transformMat4(offset, vec3::fromValues(-vitesse_marche, 0, 0), m_MatTMP);
+            vec3::add(m_Center, m_Center, offset);
+        }
+        else m_Azimut += degre_rotation_tete;
         break;
     case GLFW_KEY_A: // touche gauche S
-        m_Azimut -= degre_rotation_tete;
+        if(m_debug){
+            vec3::transformMat4(offset, vec3::fromValues(+vitesse_marche, 0, 0), m_MatTMP);
+            vec3::add(m_Center, m_Center, offset);
+        }
+        else m_Azimut -= degre_rotation_tete;
         break;
     case GLFW_KEY_Y:
         m_debug = !m_debug;
@@ -219,12 +229,14 @@ void Scene::onKeyDown(unsigned char code)
             // sauvegarder la position de la camera pour le debug
             vec3::copy(lastPosition, m_Center);
             lastAzimut = m_Azimut;
+            mat4::perspective(m_MatP, Utils::radians(35.0), (float)640 / 480, 1.0, 1000.0);
         } else {
             std::cout << "Normal mode" << std::endl << std::flush;
             // restaurer la position de la camera pour le debug
             vec3::copy(m_Center, lastPosition);
             m_Azimut = lastAzimut;
             m_Elevation = 0.0;
+            mat4::perspective(m_MatP, Utils::radians(35.0), (float)640 / 480, 1.0, 10.0);
         }
         break;
     default:
