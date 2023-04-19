@@ -180,21 +180,34 @@ void Scene::onKeyDown(unsigned char code)
         vec3::add(m_Center, m_Center, offset);
         // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << std::endl << std::flush;
         if (!m_debug){
-            if (last_Center[0] < m_Center[0])
-                maze_x = abs(floor( (m_Center[0] + rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[0] >= m_Center[0])
-                maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[2] < m_Center[2])
-                maze_y = abs(floor( (m_Center[2] + rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[2] >= m_Center[2])
-                maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
+            vec3 rayCast = vec3::create();
+            vec3::transformMat4(rayCast, vec3::fromValues(0, 0, +rayon_collision), m_MatTMP);
+            vec3::add(rayCast, m_Center, rayCast);
+            maze_x = abs(floor( (rayCast[0]) / (largeur_cube * 2) )) - 1;
+            maze_y = abs(floor( (rayCast[2]) / (largeur_cube * 2) )) - 1;
             
+            // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << " azimut: " << fmod(m_Azimut, 360) << std::endl << std::flush;
+            // int rayX;
+            // int rayY;
+            // for(int ray = 1; ray < 11; ray++){
+            //     // Ray casting (0.1 to 1.0 in 0.1 steps)
+            //     vec3 rayDir = vec3::create();
+            //     vec3::transformMat4(rayDir, vec3::fromValues(0, 0, ray * 0.1), m_MatTMP);
+            //     vec3::add(rayDir, m_Center, rayDir);
+            //     std::cout << ray * 0.1 << " " << rayDir[0] << ", " << rayDir[1] << ", " << rayDir[2] << std::endl << std::flush;
+
+            //     rayX = abs(floor( (m_Center[0] + rayDir[0] * rayon_collision) / (largeur_cube * 2) )) - 1;
+            //     rayY = abs(floor( (m_Center[2] + rayDir[2] * rayon_collision) / (largeur_cube * 2) )) - 1;
+            //     // bool res = Labyrinthe::hasWallBetweenCells(rayX, rayY, maze_x, maze_y, m_grid[rayY][rayX], m_grid[maze_y][maze_x]);
+            //     // std::cout << "res:" << res << std::endl << std::flush;
+            // }
+
+
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
                 bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
-                // std::cout << "res = " << res << std::endl << std::flush;
                 if (res){
                     vec3::subtract(m_Center, m_Center, offset);
                     std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
@@ -212,21 +225,17 @@ void Scene::onKeyDown(unsigned char code)
         vec3::add(m_Center, m_Center, offset);
         // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << std::endl << std::flush;
         if (!m_debug){
-            if (last_Center[0] < m_Center[0])
-                maze_x = abs(floor( (m_Center[0] + rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[0] >= m_Center[0])
-                maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[2] < m_Center[2])
-                maze_y = abs(floor( (m_Center[2] + rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[2] >= m_Center[2])
-                maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
+            vec3 rayCast = vec3::create();
+            vec3::transformMat4(rayCast, vec3::fromValues(0, 0, -rayon_collision), m_MatTMP);
+            vec3::add(rayCast, m_Center, rayCast);
+            maze_x = abs(floor( (rayCast[0]) / (largeur_cube * 2) )) - 1;
+            maze_y = abs(floor( (rayCast[2]) / (largeur_cube * 2) )) - 1;
             
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
                 bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
-                // std::cout << "res = " << res << std::endl << std::flush;
                 if (res){
                     vec3::subtract(m_Center, m_Center, offset);
                     std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
