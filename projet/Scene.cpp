@@ -17,7 +17,6 @@
 /** constructeur */
 Scene::Scene(int **grid)
 {
-
     m_grid = grid;
     // Création du sol
     m_Ground = new Ground();
@@ -69,6 +68,35 @@ Scene::Scene(int **grid)
     lastPosition = vec3::create();
     vec3::copy(lastPosition, m_Center);
     lastAzimut = m_Azimut;
+
+    // gestion du son
+    // ouverture du flux audio à placer dans le buffer
+    std::string soundpathname = "data/white_noise.wav";
+    buffer = alutCreateBufferFromFile(soundpathname.c_str());
+    if (buffer == AL_NONE) {
+        std::cerr << "unable to open file " << soundpathname << std::endl;
+        alGetError();
+        throw std::runtime_error("file not found or not readable");
+    }
+    // lien buffer -> source
+    alGenSources(4, sources);
+    for (int i = 0; i < 4; i++) {
+        alSourcei(sources[i], AL_BUFFER, buffer);
+    }
+    
+    alSource3f(sources[0], AL_POSITION, 0.0f, 0.0f, -1.0f); // devant
+    alSource3f(sources[1], AL_POSITION, 1.0f, 0.0f, 0.0f); // droite
+    alSource3f(sources[2], AL_POSITION, 0.0f, 0.0f, 1.0f); // derrière
+    alSource3f(sources[3], AL_POSITION, -1.0f, 0.0f, 0.0f); // gauche
+    
+    // alSource3f(sources[0], AL_VELOCITY, 1.0, 0.0, 0);
+    for(int i = 0; i < 4; i++) {
+        std::cout << "source " << i << " : " << sources[i] << std::endl << std::flush;
+        alSourcei(sources[i], AL_LOOPING, AL_TRUE);
+        alSourcef(sources[i], AL_REFERENCE_DISTANCE, 0.5f);
+        alSourcef(sources[i], AL_GAIN, 0.5);
+        // alSourcePlay(sources[i]);
+    }
 }
 
 /**
@@ -241,6 +269,34 @@ void Scene::onKeyDown(unsigned char code)
             m_Elevation = 0.0;
             mat4::perspective(m_MatP, Utils::radians(35.0), (float)640 / 480, 1.0, 10.0);
         }
+        break;
+    case GLFW_KEY_1:
+        std::cout << "Son de devant" << std::endl << std::flush;
+        for (int i = 0; i < 4; i++){
+            alSourceStop(sources[i]);
+        }
+        alSourcePlay(sources[0]);
+        break;
+    case GLFW_KEY_2:
+        std::cout << "Son de droite" << std::endl << std::flush;
+        for (int i = 0; i < 4; i++){
+            alSourceStop(sources[i]);
+        }
+        alSourcePlay(sources[1]);
+        break;
+    case GLFW_KEY_3:
+        std::cout << "Son de derriere" << std::endl << std::flush;
+        for (int i = 0; i < 4; i++){
+            alSourceStop(sources[i]);
+        }
+        alSourcePlay(sources[2]);
+        break;
+    case GLFW_KEY_4:
+        std::cout << "Son de gauche" << std::endl << std::flush;
+        for (int i = 0; i < 4; i++){
+            alSourceStop(sources[i]);
+        }
+        alSourcePlay(sources[3]);
         break;
     default:
         return;

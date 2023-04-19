@@ -49,6 +49,9 @@ private:
     vec3 lastPosition;
     float lastAzimut;
 
+    // gestion du son
+    ALuint buffer, sources[3];
+
 public:
 
     /** constructeur, crée les objets 3D à dessiner */
