@@ -81,6 +81,18 @@ bool Labyrinthe::hasWallBetweenCells(int x1, int y1, int x2, int y2, int grid1, 
         } else {
             return (grid2 & 0b0001) == 0;
         }
+    } else if (abs(x1 - x2) == abs(y1 - y2)) { // diagonal
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+        if (dx > 0 && dy > 0) { // bottom right diagonal
+            return (grid1 & 0b0010) == 0;
+        } else if (dx > 0 && dy < 0) { // top right diagonal
+            return (grid1 & 0b1000) == 0;
+        } else if (dx < 0 && dy > 0) { // bottom left diagonal
+            return (grid1 & 0b0100) == 0;
+        } else if (dx < 0 && dy < 0) { // top left diagonal
+            return (grid1 & 0b0001) == 0;
+        }
     }
     return false;
 }

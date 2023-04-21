@@ -17,7 +17,6 @@
 /** constructeur */
 Scene::Scene(int **grid)
 {
-
     m_grid = grid;
     // Création du sol
     m_Ground = new Ground();
@@ -28,6 +27,9 @@ Scene::Scene(int **grid)
         for (int y = 0; y < largeur; y++)
         {
             m_Cube[x][y] = new Cube("data/white_noise.wav", grid[x][y]);
+            vec3 pos = vec3::create();
+            vec3::set(pos, x, 0, y);
+            m_Cube[x][y]->setPosition(pos);
         }
     }
 
@@ -66,6 +68,34 @@ Scene::Scene(int **grid)
     lastPosition = vec3::create();
     vec3::copy(lastPosition, m_Center);
     lastAzimut = m_Azimut;
+
+    // gestion du son
+    // ouverture du flux audio à placer dans le buffer
+    std::string soundpathname = "data/white_noise.wav";
+    buffer = alutCreateBufferFromFile(soundpathname.c_str());
+    if (buffer == AL_NONE) {
+        std::cerr << "unable to open file " << soundpathname << std::endl;
+        alGetError();
+        throw std::runtime_error("file not found or not readable");
+    }
+    // lien buffer -> source
+    alGenSources(4, sources);
+    for (int i = 0; i < 4; i++) {
+        alSourcei(sources[i], AL_BUFFER, buffer);
+    }
+    
+    alSource3f(sources[0], AL_POSITION, 0.0f, 0.0f, -1.0f); // devant
+    alSource3f(sources[1], AL_POSITION, 1.0f, 0.0f, 0.0f); // droite
+    alSource3f(sources[2], AL_POSITION, 0.0f, 0.0f, 1.0f); // derrière
+    alSource3f(sources[3], AL_POSITION, -1.0f, 0.0f, 0.0f); // gauche
+    
+    // alSource3f(sources[0], AL_VELOCITY, 1.0, 0.0, 0);
+    for(int i = 0; i < 4; i++) {
+        alSourcei(sources[i], AL_LOOPING, AL_TRUE);
+        alSourcef(sources[i], AL_REFERENCE_DISTANCE, 0.5f);
+        alSourcef(sources[i], AL_GAIN, 0.5);
+        // alSourcePlay(sources[i]);
+    }
 }
 
 /**
@@ -147,23 +177,46 @@ void Scene::onKeyDown(unsigned char code)
     case GLFW_KEY_W: // touche avant Z
         vec3::transformMat4(offset, vec3::fromValues(0, 0, +vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
+        // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << std::endl << std::flush;
         if (!m_debug){
-            if (last_Center[0] < m_Center[0])
-                maze_x = abs(floor( (m_Center[0] + rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[0] >= m_Center[0])
-                maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[2] < m_Center[2])
-                maze_y = abs(floor( (m_Center[2] + rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[2] >= m_Center[2])
-                maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
+            vec3 rayCast = vec3::create();
+            vec3::transformMat4(rayCast, vec3::fromValues(0, 0, +rayon_collision), m_MatTMP);
+            vec3::add(rayCast, m_Center, rayCast);
+            maze_x = abs(floor( (rayCast[0]) / (largeur_cube * 2) )) - 1;
+            maze_y = abs(floor( (rayCast[2]) / (largeur_cube * 2) )) - 1;
             
-            // std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
+            std::cout << fmod(m_Center[0], largeur_cube*2) << ", " << fmod(m_Center[1], largeur_cube*2) << ", " << fmod(m_Center[2], largeur_cube*2) << " azimut: " << fmod(m_Azimut, 360) << std::endl << std::flush;
+            // Objectif : récupérer les coordonnées de la case dans laquelle se trouve le joueur
+            // avec l'azimut, on peut déterminer dans quelle direction il regarde et donc quelle mur est devant lui, à sa gauche et à sa droite avec une distance
+            // Calculer la direction dans laquelle l'utilisateur regarde
+            float direction_x = sin(m_Azimut);
+            float direction_z = cos(m_Azimut);
+
+            // Ajouter fmod(m_Center, largeur_cube*2) aux coordonnées de m_Center
+            float center_x = abs(fmod(m_Center[0], largeur_cube * 2));
+            float center_z = abs(fmod(m_Center[2], largeur_cube * 2));
+
+            // Calculer la position du mur avant
+            float avant_x = largeur_cube * 2;
+            float avant_z = largeur_cube * 2;
+            float arriere_x = 0;
+            float arriere_z = -1;
+            float gauche_x = 0;
+            float gauche_z = 0;
+            float droit_x = largeur_cube * 4;
+            float droit_z = 0;
+            
+            // Calculer la distance entre le joueur et le mur (avec sqrt((x2-x1)^2 + (y2-y1)^2))
+            float distance_avant = sqrt(pow(avant_x - center_x, 2) + pow(avant_z - center_z, 2));
+
+            std::cout << "distance avant: " << distance_avant << std::endl << std::flush;
+
+
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
                 bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
-                // std::cout << "res = " << res << std::endl << std::flush;
                 if (res){
                     vec3::subtract(m_Center, m_Center, offset);
                     std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
@@ -179,23 +232,19 @@ void Scene::onKeyDown(unsigned char code)
     case GLFW_KEY_S: // touche arrière S
         vec3::transformMat4(offset, vec3::fromValues(0, 0, -vitesse_marche), m_MatTMP);
         vec3::add(m_Center, m_Center, offset);
+        // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << std::endl << std::flush;
         if (!m_debug){
-            if (last_Center[0] < m_Center[0])
-                maze_x = abs(floor( (m_Center[0] + rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[0] >= m_Center[0])
-                maze_x = abs(floor( (m_Center[0] - rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[2] < m_Center[2])
-                maze_y = abs(floor( (m_Center[2] + rayon_collision) / (largeur_cube * 2) )) - 1;
-            if (last_Center[2] >= m_Center[2])
-                maze_y = abs(floor( (m_Center[2] - rayon_collision) / (largeur_cube * 2) )) - 1;
+            vec3 rayCast = vec3::create();
+            vec3::transformMat4(rayCast, vec3::fromValues(0, 0, -rayon_collision), m_MatTMP);
+            vec3::add(rayCast, m_Center, rayCast);
+            maze_x = abs(floor( (rayCast[0]) / (largeur_cube * 2) )) - 1;
+            maze_y = abs(floor( (rayCast[2]) / (largeur_cube * 2) )) - 1;
             
-            // std::cout << m_Center[0] << ", " << m_Center[2] << std::endl << std::flush;
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
                 std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
                 bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
-                // std::cout << "res = " << res << std::endl << std::flush;
                 if (res){
                     vec3::subtract(m_Center, m_Center, offset);
                     std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
@@ -238,6 +287,34 @@ void Scene::onKeyDown(unsigned char code)
             m_Elevation = 0.0;
             mat4::perspective(m_MatP, Utils::radians(35.0), (float)640 / 480, 1.0, 10.0);
         }
+        break;
+    case GLFW_KEY_1:
+        std::cout << "Son de devant" << std::endl << std::flush;
+        for (int i = 0; i < 4; i++){
+            alSourceStop(sources[i]);
+        }
+        alSourcePlay(sources[0]);
+        break;
+    case GLFW_KEY_2:
+        std::cout << "Son de droite" << std::endl << std::flush;
+        for (int i = 0; i < 4; i++){
+            alSourceStop(sources[i]);
+        }
+        alSourcePlay(sources[1]);
+        break;
+    case GLFW_KEY_3:
+        std::cout << "Son de derriere" << std::endl << std::flush;
+        for (int i = 0; i < 4; i++){
+            alSourceStop(sources[i]);
+        }
+        alSourcePlay(sources[2]);
+        break;
+    case GLFW_KEY_4:
+        std::cout << "Son de gauche" << std::endl << std::flush;
+        for (int i = 0; i < 4; i++){
+            alSourceStop(sources[i]);
+        }
+        alSourcePlay(sources[3]);
         break;
     default:
         return;
