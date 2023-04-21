@@ -185,9 +185,32 @@ void Scene::onKeyDown(unsigned char code)
             maze_x = abs(floor( (rayCast[0]) / (largeur_cube * 2) )) - 1;
             maze_y = abs(floor( (rayCast[2]) / (largeur_cube * 2) )) - 1;
             
-            std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << " azimut: " << fmod(m_Azimut, 360) << std::endl << std::flush;
+            std::cout << fmod(m_Center[0], largeur_cube*2) << ", " << fmod(m_Center[1], largeur_cube*2) << ", " << fmod(m_Center[2], largeur_cube*2) << " azimut: " << fmod(m_Azimut, 360) << std::endl << std::flush;
             // Objectif : récupérer les coordonnées de la case dans laquelle se trouve le joueur
             // avec l'azimut, on peut déterminer dans quelle direction il regarde et donc quelle mur est devant lui, à sa gauche et à sa droite avec une distance
+            // Calculer la direction dans laquelle l'utilisateur regarde
+            float direction_x = sin(m_Azimut);
+            float direction_z = cos(m_Azimut);
+
+            // Ajouter fmod(m_Center, largeur_cube*2) aux coordonnées de m_Center
+            float center_x = abs(fmod(m_Center[0], largeur_cube * 2));
+            float center_z = abs(fmod(m_Center[2], largeur_cube * 2));
+
+            // Calculer la position du mur avant
+            float avant_x = largeur_cube * 2;
+            float avant_z = largeur_cube * 2;
+            float arriere_x = 0;
+            float arriere_z = -1;
+            float gauche_x = 0;
+            float gauche_z = 0;
+            float droit_x = largeur_cube * 4;
+            float droit_z = 0;
+            
+            // Calculer la distance entre le joueur et le mur (avec sqrt((x2-x1)^2 + (y2-y1)^2))
+            float distance_avant = sqrt(pow(avant_x - center_x, 2) + pow(avant_z - center_z, 2));
+
+            std::cout << "distance avant: " << distance_avant << std::endl << std::flush;
+
 
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
