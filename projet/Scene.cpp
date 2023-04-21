@@ -91,7 +91,6 @@ Scene::Scene(int **grid)
     
     // alSource3f(sources[0], AL_VELOCITY, 1.0, 0.0, 0);
     for(int i = 0; i < 4; i++) {
-        std::cout << "source " << i << " : " << sources[i] << std::endl << std::flush;
         alSourcei(sources[i], AL_LOOPING, AL_TRUE);
         alSourcef(sources[i], AL_REFERENCE_DISTANCE, 0.5f);
         alSourcef(sources[i], AL_GAIN, 0.5);
@@ -186,22 +185,9 @@ void Scene::onKeyDown(unsigned char code)
             maze_x = abs(floor( (rayCast[0]) / (largeur_cube * 2) )) - 1;
             maze_y = abs(floor( (rayCast[2]) / (largeur_cube * 2) )) - 1;
             
-            // std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << " azimut: " << fmod(m_Azimut, 360) << std::endl << std::flush;
-            // int rayX;
-            // int rayY;
-            // for(int ray = 1; ray < 11; ray++){
-            //     // Ray casting (0.1 to 1.0 in 0.1 steps)
-            //     vec3 rayDir = vec3::create();
-            //     vec3::transformMat4(rayDir, vec3::fromValues(0, 0, ray * 0.1), m_MatTMP);
-            //     vec3::add(rayDir, m_Center, rayDir);
-            //     std::cout << ray * 0.1 << " " << rayDir[0] << ", " << rayDir[1] << ", " << rayDir[2] << std::endl << std::flush;
-
-            //     rayX = abs(floor( (m_Center[0] + rayDir[0] * rayon_collision) / (largeur_cube * 2) )) - 1;
-            //     rayY = abs(floor( (m_Center[2] + rayDir[2] * rayon_collision) / (largeur_cube * 2) )) - 1;
-            //     // bool res = Labyrinthe::hasWallBetweenCells(rayX, rayY, maze_x, maze_y, m_grid[rayY][rayX], m_grid[maze_y][maze_x]);
-            //     // std::cout << "res:" << res << std::endl << std::flush;
-            // }
-
+            std::cout << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2] << " azimut: " << fmod(m_Azimut, 360) << std::endl << std::flush;
+            // Objectif : récupérer les coordonnées de la case dans laquelle se trouve le joueur
+            // avec l'azimut, on peut déterminer dans quelle direction il regarde et donc quelle mur est devant lui, à sa gauche et à sa droite avec une distance
 
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
