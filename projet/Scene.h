@@ -99,6 +99,8 @@ public:
 
     /** Dessine l'image courante */
     void onDrawFrame();
+
+    void updateSound();
 };
 
 #endif
