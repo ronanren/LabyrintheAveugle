@@ -100,7 +100,7 @@ public:
     /** Dessine l'image courante */
     void onDrawFrame();
 
-    void updateSound();
+    void updateSound(int grid);
 };
 
 #endif

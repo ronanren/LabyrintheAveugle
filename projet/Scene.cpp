@@ -201,7 +201,7 @@ void Scene::onKeyDown(unsigned char code)
                 }
             }
             // Gestion du son
-            updateSound();
+            updateSound(m_grid[maze_y][maze_x]);
 
             if((maze_x == largeur - 1) && (maze_y == hauteur - 1))std::cout << "Win !" << std::endl << std::flush;
         }
@@ -233,7 +233,7 @@ void Scene::onKeyDown(unsigned char code)
                 }
             }
             // Gestion du son
-            updateSound();
+            updateSound(m_grid[maze_y][maze_x]);
 
             if((maze_x == largeur - 1) && (maze_y == hauteur - 1))std::cout << "Win !" << std::endl << std::flush;
         }
@@ -246,7 +246,9 @@ void Scene::onKeyDown(unsigned char code)
             m_Azimut += degre_rotation_tete;
         }
         // Gestion du son
-        updateSound();
+        maze_x = abs(floor( (m_Center[0]) / (largeur_cube * 2) )) - 1;
+        maze_y = abs(floor( (m_Center[2]) / (largeur_cube * 2) )) - 1;
+        updateSound(m_grid[maze_y][maze_x]);
         break;
     case GLFW_KEY_A: // touche gauche S
         if(m_debug){
@@ -256,7 +258,9 @@ void Scene::onKeyDown(unsigned char code)
             m_Azimut -= degre_rotation_tete;
         }
         // Gestion du son
-        updateSound();
+        maze_x = abs(floor( (m_Center[0]) / (largeur_cube * 2) )) - 1;
+        maze_y = abs(floor( (m_Center[2]) / (largeur_cube * 2) )) - 1;
+        updateSound(m_grid[maze_y][maze_x]);
         break;
     case GLFW_KEY_Y:
         m_debug = !m_debug;
@@ -340,12 +344,13 @@ void Scene::onDrawFrame()
     glEnd();
 }
 
-void Scene::updateSound()
+void Scene::updateSound(int grid)
 {
     float position_x = abs(fmod(m_Center[0], largeur_cube*2));
     float position_y = abs(fmod(m_Center[1], largeur_cube*2));
     float position_z = abs(fmod(m_Center[2], largeur_cube*2));
     float direction_azimut = m_Azimut;
+    std::cout << grid << std::endl << std::flush;
     while (direction_azimut < 0) {
         direction_azimut += 360;
     }
