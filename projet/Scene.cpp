@@ -265,14 +265,12 @@ void Scene::onKeyDown(unsigned char code)
             // sauvegarder la position de la camera pour le debug
             vec3::copy(lastPosition, m_Center);
             lastAzimut = m_Azimut;
-            mat4::perspective(m_MatP, Utils::radians(35.0), (float)640 / 480, 1.0, 1000.0);
         } else {
             std::cout << "Normal mode" << std::endl << std::flush;
             // restaurer la position de la camera pour le debug
             vec3::copy(m_Center, lastPosition);
             m_Azimut = lastAzimut;
             m_Elevation = 0.0;
-            mat4::perspective(m_MatP, Utils::radians(35.0), (float)640 / 480, 1.0, 10.0);
         }
         break;
     default:
