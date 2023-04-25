@@ -26,7 +26,7 @@ Scene::Scene(int **grid)
     {
         for (int y = 0; y < largeur; y++)
         {
-            m_Cube[x][y] = new Cube("data/white_noise.wav", grid[x][y]);
+            m_Cube[x][y] = new Cube(grid[x][y]);
             vec3 pos = vec3::create();
             vec3::set(pos, x, 0, y);
             m_Cube[x][y]->setPosition(pos);
@@ -94,8 +94,8 @@ Scene::Scene(int **grid)
         alSourcei(sources[i], AL_LOOPING, AL_TRUE);
         alSourcef(sources[i], AL_REFERENCE_DISTANCE, 0.2f);
         alSourcef(sources[i], AL_GAIN, 0.2);
-        alSourcePlay(sources[i]);
     }
+    updateSound();
 }
 
 /**
@@ -201,7 +201,7 @@ void Scene::onKeyDown(unsigned char code)
                 }
             }
             // Gestion du son
-            updateSound(m_grid[maze_y][maze_x]);
+            updateSound();
 
             if((maze_x == largeur - 1) && (maze_y == hauteur - 1))std::cout << "Win !" << std::endl << std::flush;
         }
@@ -233,7 +233,7 @@ void Scene::onKeyDown(unsigned char code)
                 }
             }
             // Gestion du son
-            updateSound(m_grid[maze_y][maze_x]);
+            updateSound();
 
             if((maze_x == largeur - 1) && (maze_y == hauteur - 1))std::cout << "Win !" << std::endl << std::flush;
         }
@@ -246,9 +246,7 @@ void Scene::onKeyDown(unsigned char code)
             m_Azimut += degre_rotation_tete;
         }
         // Gestion du son
-        maze_x = abs(floor( (m_Center[0]) / (largeur_cube * 2) )) - 1;
-        maze_y = abs(floor( (m_Center[2]) / (largeur_cube * 2) )) - 1;
-        updateSound(m_grid[maze_y][maze_x]);
+        updateSound();
         break;
     case GLFW_KEY_A: // touche gauche S
         if(m_debug){
@@ -258,9 +256,7 @@ void Scene::onKeyDown(unsigned char code)
             m_Azimut -= degre_rotation_tete;
         }
         // Gestion du son
-        maze_x = abs(floor( (m_Center[0]) / (largeur_cube * 2) )) - 1;
-        maze_y = abs(floor( (m_Center[2]) / (largeur_cube * 2) )) - 1;
-        updateSound(m_grid[maze_y][maze_x]);
+        updateSound();
         break;
     case GLFW_KEY_Y:
         m_debug = !m_debug;
@@ -342,12 +338,16 @@ void Scene::onDrawFrame()
     glEnd();
 }
 
-void Scene::updateSound(int grid)
+void Scene::updateSound()
 {
     float position_x = abs(fmod(m_Center[0], largeur_cube*2));
     float position_y = abs(fmod(m_Center[1], largeur_cube*2));
     float position_z = abs(fmod(m_Center[2], largeur_cube*2));
     float direction_azimut = m_Azimut;
+    int grid;
+    int maze_x = abs(floor( (m_Center[0]) / (largeur_cube * 2) )) - 1;
+    int maze_y = abs(floor( (m_Center[2]) / (largeur_cube * 2) )) - 1;
+    grid = m_grid[maze_y][maze_x];
     std::cout << grid << std::endl << std::flush;
     while (direction_azimut < 0) {
         direction_azimut += 360;
@@ -359,18 +359,78 @@ void Scene::updateSound(int grid)
         distance_devant = largeur_cube*2 - position_x;
         distance_droite = largeur_cube*2 - position_z;
         distance_gauche = position_z;
+        for(int i = 0; i < 3; i++){
+            alSourcePlay(sources[i]);
+        }
+        if ((grid & 0b0010) == 2){
+            alSourcePause(sources[1]);
+            std::cout << "son de droite en pause" << std::endl << std::flush;
+        }
+        if ((grid & 0b0100) == 4){
+            alSourcePause(sources[0]);
+            std::cout << "son de devant en pause" << std::endl << std::flush;
+        }
+        if ((grid & 0b1000) == 8){
+            alSourcePause(sources[2]);
+            std::cout << "son de gauche en pause" << std::endl << std::flush;
+        }
     } else if (direction_azimut == 180){
         distance_devant = largeur_cube*2 - position_z;
         distance_droite = position_x;
         distance_gauche = largeur_cube*2 - position_x;
+        for(int i = 0; i < 3; i++){
+            alSourcePlay(sources[i]);
+        }
+        if ((grid & 0b0001) == 1){
+            alSourcePause(sources[1]);
+            std::cout << "son de droite en pause" << std::endl << std::flush;
+        }
+        if ((grid & 0b0010) == 2){
+            alSourcePause(sources[0]);
+            std::cout << "son de devant en pause" << std::endl << std::flush;
+        }
+        if ((grid & 0b0100) == 4){
+            alSourcePause(sources[2]);
+            std::cout << "son de gauche en pause" << std::endl << std::flush;
+        }
     } else if (direction_azimut == 270){
         distance_devant = position_x;
         distance_droite = position_z;
         distance_gauche = largeur_cube*2 - position_z;
+        for(int i = 0; i < 3; i++){
+            alSourcePlay(sources[i]);
+        }
+        if ((grid & 0b0001) == 1){
+            alSourcePause(sources[0]);
+            std::cout << "son de devant en pause" << std::endl << std::flush;
+        }
+        if ((grid & 0b0010) == 2){
+            alSourcePause(sources[2]);
+            std::cout << "son de gauche en pause" << std::endl << std::flush;
+        }
+        if ((grid & 0b1000) == 8){
+            alSourcePause(sources[1]);
+            std::cout << "son de droite en pause" << std::endl << std::flush;
+        }
     } else if (direction_azimut == 0){
         distance_devant = position_z;
         distance_droite = largeur_cube*2 - position_x;
         distance_gauche = position_x;
+        for(int i = 0; i < 3; i++){
+            alSourcePlay(sources[i]);
+        }
+        if ((grid & 0b0001) == 1){
+            alSourcePause(sources[2]);
+            std::cout << "son de gauche en pause" << std::endl << std::flush;
+        }
+        if ((grid & 0b0100) == 4){
+            alSourcePause(sources[1]);
+            std::cout << "son de droite en pause" << std::endl << std::flush;
+        }
+        if ((grid & 0b1000) == 8){
+            alSourcePause(sources[0]);
+            std::cout << "son de devant en pause" << std::endl << std::flush;
+        }
     }
     alSource3f(sources[0], AL_POSITION, 0.0f, 0.0f, -distance_devant); // devant
     alSource3f(sources[1], AL_POSITION, distance_droite, 0.0f, 0.0f); // droite

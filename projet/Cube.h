@@ -23,7 +23,7 @@ private:
 public:
 
     /** constructeur, crée le VBO et le shader */
-    Cube(std::string soundpathname, int walls);
+    Cube(int walls);
 
     /** destructeur, libère le VBO et le shader */
     ~Cube();

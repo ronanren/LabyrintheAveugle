@@ -55,7 +55,7 @@ public:
 };
 
 /** constructeur */
-Cube::Cube(std::string soundpathname, int walls) : Mesh("cube")
+Cube::Cube(int walls) : Mesh("cube")
 {
     // matériau
     m_Material = new MaterialCube();
