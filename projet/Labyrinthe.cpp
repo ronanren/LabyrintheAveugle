@@ -68,7 +68,7 @@ int **Labyrinthe::generer()
 }
 
 bool Labyrinthe::hasWallBetweenCells(int x1, int y1, int x2, int y2, int grid1, int grid2) {
-    std::cout << "hasWallBetweenCells(" << x1 << ", " << y1 << ", " << x2 << ", " << y2 << ", " << grid1 << ", " << grid2 << ")" << std::endl;
+    // std::cout << "hasWallBetweenCells(" << x1 << ", " << y1 << ", " << x2 << ", " << y2 << ", " << grid1 << ", " << grid2 << ")" << std::endl;
     if (x1 == x2) {
         if (y1 > y2) {
             return (grid1 & 0b1000) == 0;

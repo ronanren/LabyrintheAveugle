@@ -13,6 +13,7 @@
 
 #include "Scene.h"
 #include "Labyrinthe.h"
+#include "unistd.h"
 
 /** constructeur */
 Scene::Scene(int **grid)
@@ -71,10 +72,9 @@ Scene::Scene(int **grid)
 
     // gestion du son
     // ouverture du flux audio à placer dans le buffer
-    std::string soundpathname = "data/white_noise.wav";
-    buffer = alutCreateBufferFromFile(soundpathname.c_str());
+    buffer = alutCreateBufferFromFile("data/white_noise.wav");
     if (buffer == AL_NONE) {
-        std::cerr << "unable to open file " << soundpathname << std::endl;
+        std::cerr << "unable to open file" << std::endl;
         alGetError();
         throw std::runtime_error("file not found or not readable");
     }
@@ -86,15 +86,15 @@ Scene::Scene(int **grid)
     
     alSource3f(sources[0], AL_POSITION, 0.0f, 0.0f, -largeur_cube); // devant
     alSource3f(sources[1], AL_POSITION, largeur_cube, 0.0f, 0.0f); // droite
-    // alSource3f(sources[2], AL_POSITION, 0.0f, 0.0f, 1.0f); // derrière
     alSource3f(sources[2], AL_POSITION, -largeur_cube, 0.0f, 0.0f); // gauche
     
-    // alSource3f(sources[0], AL_VELOCITY, 1.0, 0.0, 0);
     for(int i = 0; i < 3; i++) {
         alSourcei(sources[i], AL_LOOPING, AL_TRUE);
-        alSourcef(sources[i], AL_REFERENCE_DISTANCE, 0.2f);
-        alSourcef(sources[i], AL_GAIN, 0.2);
+        alSourcef(sources[i], AL_REFERENCE_DISTANCE, 0.4f);
+        alSourcef(sources[i], AL_GAIN, 0.4);
     }
+
+    mode_son = 1;
     updateSound();
 }
 
@@ -188,12 +188,12 @@ void Scene::onKeyDown(unsigned char code)
             // Gestion des collisions
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
-                std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
+                // std::cout << "Vous avez atteint les limites du labyrinthe" << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
                 bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
                 if (res){
                     vec3::subtract(m_Center, m_Center, offset);
-                    std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
+                    // std::cout << "Vous avez atteint un mur" << std::endl;
                 } else {
                     last_maze_x = maze_x;
                     last_maze_y = maze_y;
@@ -201,9 +201,9 @@ void Scene::onKeyDown(unsigned char code)
                 }
             }
             // Gestion du son
-            updateSound();
+            if (mode_son == 1) updateSound();
 
-            if((maze_x == largeur - 1) && (maze_y == hauteur - 1))std::cout << "Win !" << std::endl << std::flush;
+            verifyWin(maze_x, maze_y);
         }
         break;
     case GLFW_KEY_S: // touche arrière S
@@ -220,12 +220,12 @@ void Scene::onKeyDown(unsigned char code)
             // Gestion des collisions
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
-                std::cout << "Vous avez atteint les limites du labyrinthe" << m_Center[0] << ", " << m_Center[2] << std::endl;
+                // std::cout << "Vous avez atteint les limites du labyrinthe" << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
                 bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
                 if (res){
                     vec3::subtract(m_Center, m_Center, offset);
-                    std::cout << "Vous avez atteint un mur" << m_Center[0] << ", " << m_Center[2] << std::endl;
+                    // std::cout << "Vous avez atteint un mur" << std::endl;
                 } else {
                     last_maze_x = maze_x;
                     last_maze_y = maze_y;
@@ -233,9 +233,9 @@ void Scene::onKeyDown(unsigned char code)
                 }
             }
             // Gestion du son
-            updateSound();
+            if (mode_son == 1) updateSound();
 
-            if((maze_x == largeur - 1) && (maze_y == hauteur - 1))std::cout << "Win !" << std::endl << std::flush;
+            verifyWin(maze_x, maze_y);
         }
         break;
     case GLFW_KEY_D: // touche droite D
@@ -246,7 +246,7 @@ void Scene::onKeyDown(unsigned char code)
             m_Azimut += degre_rotation_tete;
         }
         // Gestion du son
-        updateSound();
+        if (mode_son == 1) updateSound();
         break;
     case GLFW_KEY_A: // touche gauche S
         if(m_debug){
@@ -256,7 +256,7 @@ void Scene::onKeyDown(unsigned char code)
             m_Azimut -= degre_rotation_tete;
         }
         // Gestion du son
-        updateSound();
+        if (mode_son == 1) updateSound();
         break;
     case GLFW_KEY_Y:
         m_debug = !m_debug;
@@ -271,6 +271,30 @@ void Scene::onKeyDown(unsigned char code)
             vec3::copy(m_Center, lastPosition);
             m_Azimut = lastAzimut;
             m_Elevation = 0.0;
+        }
+        break;
+    case GLFW_KEY_Z:
+        if (mode_son == 1){
+            mode_son = 0;
+            std::cout << "Mode Echo-location simple" << std::endl << std::flush;
+            for(int i=0; i < 3; i++){
+                alSourcePause(sources[i]);
+            }
+        } else {
+            for(int i=0; i < 3; i++){
+                alSourcei(sources[i], AL_LOOPING, AL_FALSE);
+            }
+            updateSound();
+        }
+        break;
+    case GLFW_KEY_X:
+        if (mode_son == 0){
+            mode_son = 1;
+            std::cout << "Mode Echo-location avancée" << std::endl << std::flush;
+            for(int i=0; i < 3; i++){
+                alSourcei(sources[i], AL_LOOPING, AL_TRUE);
+            }
+            updateSound();
         }
         break;
     default:
@@ -348,93 +372,119 @@ void Scene::updateSound()
     int maze_x = abs(floor( (m_Center[0]) / (largeur_cube * 2) )) - 1;
     int maze_y = abs(floor( (m_Center[2]) / (largeur_cube * 2) )) - 1;
     grid = m_grid[maze_y][maze_x];
-    std::cout << grid << std::endl << std::flush;
     while (direction_azimut < 0) {
         direction_azimut += 360;
     }
     direction_azimut = fmod(direction_azimut, 360);
-    std::cout << position_x << ", " << position_y << ", " << position_z << " azimut: " << direction_azimut << std::endl << std::flush;
+    // std::cout << position_x << ", " << position_y << ", " << position_z << " azimut: " << direction_azimut << std::endl << std::flush;
     float distance_devant, distance_droite, distance_gauche;
     if (direction_azimut == 90){
         distance_devant = largeur_cube*2 - position_x;
         distance_droite = largeur_cube*2 - position_z;
         distance_gauche = position_z;
+        int sourceAudioState;
         for(int i = 0; i < 3; i++){
-            alSourcePlay(sources[i]);
+            alGetSourcei(sources[i], AL_SOURCE_STATE, &sourceAudioState);
+            if (sourceAudioState != AL_PLAYING) alSourcePlay(sources[i]);
         }
         if ((grid & 0b0010) == 2){
             alSourcePause(sources[1]);
-            std::cout << "son de droite en pause" << std::endl << std::flush;
+            // std::cout << "son de droite en pause" << std::endl << std::flush;
         }
         if ((grid & 0b0100) == 4){
             alSourcePause(sources[0]);
-            std::cout << "son de devant en pause" << std::endl << std::flush;
+            // std::cout << "son de devant en pause" << std::endl << std::flush;
         }
         if ((grid & 0b1000) == 8){
             alSourcePause(sources[2]);
-            std::cout << "son de gauche en pause" << std::endl << std::flush;
+            // std::cout << "son de gauche en pause" << std::endl << std::flush;
         }
     } else if (direction_azimut == 180){
         distance_devant = largeur_cube*2 - position_z;
         distance_droite = position_x;
         distance_gauche = largeur_cube*2 - position_x;
+        int sourceAudioState;
         for(int i = 0; i < 3; i++){
-            alSourcePlay(sources[i]);
+            alGetSourcei(sources[i], AL_SOURCE_STATE, &sourceAudioState);
+            if (sourceAudioState != AL_PLAYING) alSourcePlay(sources[i]);
         }
         if ((grid & 0b0001) == 1){
             alSourcePause(sources[1]);
-            std::cout << "son de droite en pause" << std::endl << std::flush;
+            // std::cout << "son de droite en pause" << std::endl << std::flush;
         }
         if ((grid & 0b0010) == 2){
             alSourcePause(sources[0]);
-            std::cout << "son de devant en pause" << std::endl << std::flush;
+            // std::cout << "son de devant en pause" << std::endl << std::flush;
         }
         if ((grid & 0b0100) == 4){
             alSourcePause(sources[2]);
-            std::cout << "son de gauche en pause" << std::endl << std::flush;
+            // std::cout << "son de gauche en pause" << std::endl << std::flush;
         }
     } else if (direction_azimut == 270){
         distance_devant = position_x;
         distance_droite = position_z;
         distance_gauche = largeur_cube*2 - position_z;
+        int sourceAudioState;
         for(int i = 0; i < 3; i++){
-            alSourcePlay(sources[i]);
+            alGetSourcei(sources[i], AL_SOURCE_STATE, &sourceAudioState);
+            if (sourceAudioState != AL_PLAYING) alSourcePlay(sources[i]);
         }
         if ((grid & 0b0001) == 1){
             alSourcePause(sources[0]);
-            std::cout << "son de devant en pause" << std::endl << std::flush;
+            // std::cout << "son de devant en pause" << std::endl << std::flush;
         }
         if ((grid & 0b0010) == 2){
             alSourcePause(sources[2]);
-            std::cout << "son de gauche en pause" << std::endl << std::flush;
+            // std::cout << "son de gauche en pause" << std::endl << std::flush;
         }
         if ((grid & 0b1000) == 8){
             alSourcePause(sources[1]);
-            std::cout << "son de droite en pause" << std::endl << std::flush;
+            // std::cout << "son de droite en pause" << std::endl << std::flush;
         }
     } else if (direction_azimut == 0){
         distance_devant = position_z;
         distance_droite = largeur_cube*2 - position_x;
         distance_gauche = position_x;
+        int sourceAudioState;
         for(int i = 0; i < 3; i++){
-            alSourcePlay(sources[i]);
+            alGetSourcei(sources[i], AL_SOURCE_STATE, &sourceAudioState);
+            if (sourceAudioState != AL_PLAYING) alSourcePlay(sources[i]);
         }
         if ((grid & 0b0001) == 1){
             alSourcePause(sources[2]);
-            std::cout << "son de gauche en pause" << std::endl << std::flush;
+            // std::cout << "son de gauche en pause" << std::endl << std::flush;
         }
         if ((grid & 0b0100) == 4){
             alSourcePause(sources[1]);
-            std::cout << "son de droite en pause" << std::endl << std::flush;
+            // std::cout << "son de droite en pause" << std::endl << std::flush;
         }
         if ((grid & 0b1000) == 8){
             alSourcePause(sources[0]);
-            std::cout << "son de devant en pause" << std::endl << std::flush;
+            // std::cout << "son de devant en pause" << std::endl << std::flush;
         }
     }
     alSource3f(sources[0], AL_POSITION, 0.0f, 0.0f, -distance_devant); // devant
     alSource3f(sources[1], AL_POSITION, distance_droite, 0.0f, 0.0f); // droite
     alSource3f(sources[2], AL_POSITION, -distance_gauche, 0.0f, 0.0f); // gauche
+}
+
+void Scene::verifyWin(int maze_x, int maze_y){
+    if ((maze_x == largeur - 1) && (maze_y == hauteur - 1)){
+        std::cout << "Gagné !" << std::endl << std::flush;
+        for (int i=0; i < 3; i++)
+            alSourceStop(sources[i]);
+
+        ALuint bufferVictory = alutCreateBufferFromFile("data/victory_FF7.wav");
+        ALuint sourceVictory[1];
+        alGenSources(1, sourceVictory);
+        alSourcei(sourceVictory[0], AL_BUFFER, bufferVictory);
+        alSource3f(sourceVictory[0], AL_POSITION, 0.0f, 0.0f, 0.0f); // centre
+        alSourcef(sourceVictory[0], AL_REFERENCE_DISTANCE, 0.2f);
+        alSourcef(sourceVictory[0], AL_GAIN, 0.2);
+        alSourcePlay(sourceVictory[0]);
+        sleep(11);
+        exit(0);
+    }
 }
 
 /** supprime tous les objets de cette scène */

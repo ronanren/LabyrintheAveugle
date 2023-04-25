@@ -51,6 +51,7 @@ private:
 
     // gestion du son
     ALuint buffer, sources[3];
+    int mode_son;
 
 public:
 
@@ -101,6 +102,7 @@ public:
     void onDrawFrame();
 
     void updateSound();
+    void verifyWin(int maze_x, int maze_y);
 };
 
 #endif
