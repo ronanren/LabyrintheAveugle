@@ -50,7 +50,7 @@ private:
     float lastAzimut;
 
     // gestion du son
-    ALuint buffer, sources[3];
+    ALuint buffer, sources[3], sourceCollision;
     int mode_son;
 
 public:

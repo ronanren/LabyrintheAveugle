@@ -46,6 +46,8 @@ public:
      * @param vec3 pos position
      */
     void setPosition(vec3 pos);
+
+    void stopSound();
 };
 
 #endif

@@ -27,7 +27,10 @@ Scene::Scene(int **grid)
     {
         for (int y = 0; y < largeur; y++)
         {
-            m_Cube[x][y] = new Cube(grid[x][y]);
+            if (x == hauteur-1 && y == largeur-1)
+                m_Cube[x][y] = new Cube(grid[x][y] + 20);
+            else
+                m_Cube[x][y] = new Cube(grid[x][y]);
             vec3 pos = vec3::create();
             vec3::set(pos, x, 0, y);
             m_Cube[x][y]->setPosition(pos);
@@ -94,6 +97,19 @@ Scene::Scene(int **grid)
         alSourcef(sources[i], AL_GAIN, 0.4);
     }
 
+    // gestion du son lors d'une collision
+    ALuint bufferCollision = alutCreateBufferFromFile("data/hurt.wav");
+    if (bufferCollision == AL_NONE) {
+        std::cerr << "unable to open file" << std::endl;
+        alGetError();
+        throw std::runtime_error("file not found or not readable");
+    }
+    alGenSources(1, &sourceCollision);
+    alSourcei(sourceCollision, AL_BUFFER, bufferCollision);
+    alSourcef(sourceCollision, AL_REFERENCE_DISTANCE, 0.4f);
+    alSourcef(sourceCollision, AL_GAIN, 0.4);
+    alSource3f(sourceCollision, AL_POSITION, 0.0f, 0.0f, 0.0f);
+
     mode_son = 1;
     updateSound();
 }
@@ -109,7 +125,7 @@ void Scene::onSurfaceChanged(int width, int height)
     glViewport(0, 0, width, height);
 
     // matrice de projection (champ de vision)
-    mat4::perspective(m_MatP, Utils::radians(35.0), (float)width / height, 1.0, 1000.0);
+    mat4::perspective(m_MatP, Utils::radians(35.0), (float)width / height, 1.0, 1.0);
 }
 
 /**
@@ -188,11 +204,13 @@ void Scene::onKeyDown(unsigned char code)
             // Gestion des collisions
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
+                alSourcePlay(sourceCollision);
                 // std::cout << "Vous avez atteint les limites du labyrinthe" << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
                 bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
                 if (res){
                     vec3::subtract(m_Center, m_Center, offset);
+                    alSourcePlay(sourceCollision);
                     // std::cout << "Vous avez atteint un mur" << std::endl;
                 } else {
                     last_maze_x = maze_x;
@@ -220,11 +238,13 @@ void Scene::onKeyDown(unsigned char code)
             // Gestion des collisions
             if (abs(m_Center[0]) <= rayon_collision || abs(m_Center[2]) <= rayon_collision || abs(m_Center[0]) >= largeur_cube * 2 * largeur - rayon_collision || abs(m_Center[2]) >= largeur_cube * 2 * hauteur - rayon_collision){
                 vec3::subtract(m_Center, m_Center, offset);
+                alSourcePlay(sourceCollision);
                 // std::cout << "Vous avez atteint les limites du labyrinthe" << std::endl;
             } else if (last_maze_y != maze_y || last_maze_x != maze_x){
                 bool res = Labyrinthe::hasWallBetweenCells(last_maze_x, last_maze_y, maze_x, maze_y, m_grid[last_maze_y][last_maze_x], m_grid[maze_y][maze_x]);
                 if (res){
                     vec3::subtract(m_Center, m_Center, offset);
+                    alSourcePlay(sourceCollision);
                     // std::cout << "Vous avez atteint un mur" << std::endl;
                 } else {
                     last_maze_x = maze_x;
@@ -260,13 +280,23 @@ void Scene::onKeyDown(unsigned char code)
         break;
     case GLFW_KEY_Y:
         m_debug = !m_debug;
+        int viewport[4];
+        int width, height;
+        glGetIntegerv(GL_VIEWPORT, viewport);
+        width = viewport[2];
+        height = viewport[3];
         if (m_debug){
             std::cout << "Debug mode" << std::endl << std::flush;
+            mat4::perspective(m_MatP, Utils::radians(35.0), (float)width/height, 1.0, 1000.0);
             // sauvegarder la position de la camera pour le debug
             vec3::copy(lastPosition, m_Center);
             lastAzimut = m_Azimut;
+            vec3::transformMat4(offset, vec3::fromValues(0, -largeur_cube*20, 0), m_MatTMP);
+            vec3::add(m_Center, m_Center, offset);
+            m_Elevation = 90.0;
         } else {
             std::cout << "Normal mode" << std::endl << std::flush;
+            mat4::perspective(m_MatP, Utils::radians(35.0), (float)width/height, 1.0, 1.0);
             // restaurer la position de la camera pour le debug
             vec3::copy(m_Center, lastPosition);
             m_Azimut = lastAzimut;
@@ -474,14 +504,14 @@ void Scene::verifyWin(int maze_x, int maze_y){
         for (int i=0; i < 3; i++)
             alSourceStop(sources[i]);
 
+        m_Cube[hauteur-1][largeur-1]->stopSound();
         ALuint bufferVictory = alutCreateBufferFromFile("data/victory_FF7.wav");
-        ALuint sourceVictory[1];
-        alGenSources(1, sourceVictory);
-        alSourcei(sourceVictory[0], AL_BUFFER, bufferVictory);
-        alSource3f(sourceVictory[0], AL_POSITION, 0.0f, 0.0f, 0.0f); // centre
-        alSourcef(sourceVictory[0], AL_REFERENCE_DISTANCE, 0.2f);
-        alSourcef(sourceVictory[0], AL_GAIN, 0.2);
-        alSourcePlay(sourceVictory[0]);
+        ALuint sourceVictory;
+        alGenSources(1, &sourceVictory);
+        alSourcei(sourceVictory, AL_BUFFER, bufferVictory);
+        alSource3f(sourceVictory, AL_POSITION, 0.0f, 0.0f, 0.0f); // centre
+        alSourcef(sourceVictory, AL_GAIN, 0.25);
+        alSourcePlay(sourceVictory);
         sleep(11);
         exit(0);
     }
