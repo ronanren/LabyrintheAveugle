@@ -109,6 +109,14 @@ Cube::Cube(int walls) : Mesh("cube")
         alSourcei(source, AL_LOOPING, AL_TRUE);
         alSourcef(source, AL_GAIN, 0.2);
         alSourcePlay(source);
+        P0->setColor(0.0, 0.5, 0.0); // P0 couleur vert foncé
+        P1->setColor(0.0, 0.6, 0.0); // P1 couleur vert
+        P2->setColor(0.0, 0.7, 0.0); // P2 couleur vert clair
+        P3->setColor(0.0, 0.8, 0.0); // P3 couleur vert plus clair
+        P4->setColor(0.0, 0.9, 0.0); // P4 couleur vert encore plus clair
+        P5->setColor(0.0, 1.0, 0.0); // P5 couleur vert vif
+        P6->setColor(0.1, 1.0, 0.1); // P6 couleur vert pastel
+        P7->setColor(0.2, 1.0, 0.2); // P7 couleur vert très clair
     }
 
     if ((walls >=1) && (walls <= 3) || (walls >= 8) && (walls <= 11)){

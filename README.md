@@ -15,8 +15,20 @@ sudo apt install g++ mesa-utils libglew-dev libglfw3-dev libsdl2-dev libsdl2-ima
 make cleanalllibs && make main && make run
 ```
 
-Apprendre openGL : https://learnopengl.com/Introduction
-
 ## Rapport
 
-https://github.com/typst/typst
+Disponible dans /rapport/rapport_contenu_multimedia_FISA2_Renoux_Louboutin_Cordier.pdf
+
+## Exemples
+
+La joueur se retrouve en POV avec une vision (caché) comme ci-dessous :
+
+<img src="https://raw.githubusercontent.com/ronanren/LabyrintheAveugle/main/rapport/visuelPOVSansEcranNoir.png?token=GHSAT0AAAAAAB35CIYYXZRTEIHY5N64SWU6ZCKGMIA" width="400px">
+
+Le joueur peut avancer (touche Z), reculer (touche S) et tourner de 90° vers la droite (touche D) et vers la gauche (touche Q). De plus, il y a des commandes pour afficher le mode spectateur, et la gestion des modes du son comme indiqué dans la console.
+
+<img src="https://raw.githubusercontent.com/ronanren/LabyrintheAveugle/main/rapport/commandesConsole.png?token=GHSAT0AAAAAAB35CIYYXZRTEIHY5N64SWU6ZCKGMIA" width="500px">
+
+Le mode debug (spectateur) affiche le labyrinthe de haut avec l'arrivé en vert.
+
+<img src="https://raw.githubusercontent.com/ronanren/LabyrintheAveugle/main/rapport/debugMode.png?token=GHSAT0AAAAAAB35CIYYXZRTEIHY5N64SWU6ZCKGMIA" width="500px">
