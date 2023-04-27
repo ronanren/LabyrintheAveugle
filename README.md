@@ -21,7 +21,7 @@ Disponible dans /rapport/rapport_contenu_multimedia_FISA2_Renoux_Louboutin_Cordi
 
 ## Exemples
 
-La joueur se retrouve en POV avec une vision (caché) comme ci-dessous :
+La joueur se retrouve en POV avec une vision (non caché ici) comme ci-dessous :
 
 <img src="https://raw.githubusercontent.com/ronanren/LabyrintheAveugle/main/rapport/visuelPOVSansEcranNoir.png?token=GHSAT0AAAAAAB35CIYYTDB4XPEJQBGFJCWYZCKGUCA" width="400px">
 
